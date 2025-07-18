@@ -33,18 +33,17 @@ class Algorithm:
     """
     _price_scale = 1  # Default price scale, can be overridden in subclasses
     def __init__(self):
-        self.vectorized = False
-        self.name = None
-        self.init_cash = 1_000_000_000 # Default initial cash, can be overridden in subclasses
-        self.init_fee = 0.001
-        self.fixed_fee = 25_000
-        self.slippage = 0.05  # Assumed slippage price impact, can be overridden in subclasses
-        self.resolution = None
-        self.ticker = None
-        self.from_time = None
-        self.to_time = None
-        self.df_ticker = pd.DataFrame()
-        self.features: Union[None, TimeseriesFeature] = None
+        self._name = None
+        self._init_cash = 1_000_000_000 # Default initial cash, can be overridden in subclasses
+        self._init_fee = 0.001
+        self._fixed_fee = 25_000
+        self._slippage = 0.05  # Assumed slippage price impact, can be overridden in subclasses
+        self._resolution = None
+        self._ticker = None
+        self._from_time = None
+        self._to_time = None
+        self._df_ticker = pd.DataFrame()
+        self._features: Union[None, TimeseriesFeature] = None
         self._init_price: float | None = None
         # The benchmark is used to compare the performance of the algorithm
         self._bm_open_size: int | None = None  # Number of shares for the benchmark, can be set in subclasses
@@ -84,8 +83,8 @@ class Algorithm:
         # Allocate empty lists for history records
         self._current_time = self.df_ticker.index[0] if not self.df_ticker.empty else None
         # Initialize benchmark equity and current equity
-        self._bm_equity = self.init_cash
-        self._current_equity = self.init_cash
+        self._bm_equity = self._init_cash
+        self._current_equity = self._init_cash
         # Add result backtest
         self._bt_df = pd.DataFrame(columns=self._bt_columns)
         # Init signals with all zeroes
@@ -112,15 +111,6 @@ class Algorithm:
     def sell(self, conditions, weight=1):
         self._signals[conditions] = -weight  # Set sell signal at the current time
 
-    def __df_val__(self, col):
-        """
-        Helper method to get the value from the DataFrame based on the current time index.
-        """
-        if self.vectorized:
-            return self.df_ticker[col]
-        else:
-            return self.df_ticker[col].iloc[self._current_time_idx]
-
     @property
     def Open(self):
         return self.df_ticker['Open']
@@ -142,15 +132,15 @@ class Algorithm:
         return self.df_ticker['Volume']
 
     def __load_data__(self):
-        assert self.ticker is not None, "Ticker must be set before loading data."
-        logging.info(f"Loading data for tickers: {self.ticker} from {self.from_time} to {self.to_time}")
-        data_handler = OHLCHandler([self.ticker], resolution='D')
-        data_handler.load_data(from_time=self.from_time, to_time=self.to_time)
-        self.df_ticker = data_handler.get_data(self.ticker)
-        self.df_ticker = self.df_ticker.xs(self.ticker, level="Symbol", drop_level=True)
+        assert self._ticker is not None, "Ticker must be set before loading data."
+        logging.info(f"Loading data for tickers: {self._ticker} from {self._from_time} to {self._to_time}")
+        data_handler = OHLCHandler([self._ticker], resolution='D')
+        data_handler.load_data(from_time=self._from_time, to_time=self._to_time)
+        self.df_ticker = data_handler.get_data(self._ticker)
+        self.df_ticker = self.df_ticker.xs(self._ticker, level="Symbol", drop_level=True)
         if self.df_ticker.empty:
-            raise ValueError(f"No data found for ticker {self.ticker} in the specified date range.")
-        logging.info(f"Data loaded for ticker {self.ticker} with {len(self.df_ticker)} records.")
+            raise ValueError(f"No data found for ticker {self._ticker} in the specified date range.")
+        logging.info(f"Data loaded for ticker {self._ticker} with {len(self.df_ticker)} records.")
 
     def run(self):
         """
@@ -159,7 +149,7 @@ class Algorithm:
         self.__setup__()
         self.__load_data__()
         self.__reset__()
-        self.features = TimeseriesFeature(self.df_ticker)  # Initialize features with the full DataFrame
+        self._features = TimeseriesFeature(self.df_ticker)  # Initialize features with the full DataFrame
         # Run the core trading algorithm (fills self._signals)
         self.__algorithm__()
         if not hasattr(self, "_signals") or self._signals is None:
@@ -184,7 +174,7 @@ class Algorithm:
         return CROSS(series1, series2)
 
     @classmethod
-    def above(self, series1: Union[pd.Series, np.ndarray, float], series2: Union[pd.Series, np.ndarray, float]) -> bool:
+    def above(cls, series1: Union[pd.Series, np.ndarray, float], series2: Union[pd.Series, np.ndarray, float]) -> bool:
         """
         Check if series1 is above series2.
 
@@ -247,7 +237,7 @@ class Algorithm:
         1. Convert the results to pd.DataFrame.
         2. Add columns: `step_ret`, `cum_ret`, `bm_step_ret`, `bm_cum_ret`.
         """
-        logging.info(f"Algorithm `{self.name}` run completed. Total records: {len(self._bt_results)}")
+        logging.info(f"Algorithm `{self._name}` run completed. Total records: {len(self._bt_results)}")
         self._bt_df = pd.DataFrame(self._bt_results, columns=self._bt_columns)
         # Vectorized calculations for returns
         equity = self._bt_df['equity'].values
@@ -270,5 +260,5 @@ class Algorithm:
 
     def visualize(self):
         visualizer = StrategyVisualizer(self._bt_df)
-        visualizer.name = self.name
+        visualizer.name = self._name
         visualizer.visualize()

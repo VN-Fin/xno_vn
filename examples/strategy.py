@@ -4,18 +4,18 @@ from xno.algo.st import StockAlgorithm
 
 class MyAlgorithm(StockAlgorithm):
     def __setup__(self):
-        self.name = "My SHB Algorithm"
-        self.ticker = "SHB"
-        self.resolution = "D"
-        self.from_time = "2020-01-01"
-        self.to_time = "2025-07-04"
-        self.init_cash = 500_000_000
-        self.slippage = 0.05
+        self._name = "My SHB Algorithm"
+        self._ticker = "SHB"
+        self._resolution = "D"
+        self._from_time = "2020-01-01"
+        self._to_time = "2025-07-04"
+        self._init_cash = 500_000_000
+        self._slippage = 0.05
 
     def __algorithm__(self):
         # Indicators
-        rsi = self.features.rsi()
-        adx = self.features.adx()
+        rsi = self._features.rsi()
+        adx = self._features.adx()
 
         # The logical AND operator can be used directly by using `&` or `self.And()`
         buy_signal = (self.current(rsi) > self.previous(rsi)) & (self.current(adx) < self.previous(adx))
