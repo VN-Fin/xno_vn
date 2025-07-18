@@ -44,7 +44,7 @@ class StockAlgorithm(Algorithm):
         bm_fee = self._init_price * self._bm_open_size * self.init_fee  # Recalculate benchmark fee based on shares and initial price
         self._bm_equity -= bm_fee
 
-    def __step__(self):
+    def __step__(self, time_idx: int):
         """
         Run the trading algorithm state, which includes setting up the algorithm, generating signals, and verifying the trading signal.
 
@@ -56,6 +56,7 @@ class StockAlgorithm(Algorithm):
         5. Shares are computed based on the initial cash, current price, and lot size.
         6. If conditions for selling are not met, the signal is ignored until eligible.
         """
+        super().__step__(time_idx)  # Call the base step method to update the current time index
         current_action = "H"  # Default action is hold
         current_signal = 0.0
         current_trade_size = 0.0
@@ -63,7 +64,7 @@ class StockAlgorithm(Algorithm):
         current_price = self._ht_prices[self._current_time_idx]  # Get the current price from the history prices]
         current_time = self._ht_times[self._current_time_idx]   # Current day from the timestamp
         # The signal unverified, which is the current signal at the current time index
-        sig: float = self._ht_signals[self._current_time_idx]
+        sig: float = self._signals.values[self._current_time_idx]
         # Calculate the benchmark shares based on initial cash and current price
         current_max_shares = round_to_lot(self.init_cash // current_price, self._stock_lot_size)
 
@@ -131,7 +132,7 @@ class StockAlgorithm(Algorithm):
 
         self._current_equity += current_pnl     # Update current equity with PnL
         self._bm_equity += bm_pnl               # Update benchmark equity with benchmark PnL
-        # Update the result record with StrategyPerformancethe current state
+        # Update the result record the current state
         self._bt_results.append(
             HistoryRecord(
                 time=current_time,

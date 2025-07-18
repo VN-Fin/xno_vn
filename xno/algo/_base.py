@@ -38,7 +38,7 @@ class Algorithm:
         self.init_cash = 1_000_000_000 # Default initial cash, can be overridden in subclasses
         self.init_fee = 0.001
         self.fixed_fee = 25_000
-        self.slippage = 0.05
+        self.slippage = 0.05  # Assumed slippage price impact, can be overridden in subclasses
         self.resolution = None
         self.ticker = None
         self.from_time = None
@@ -92,8 +92,8 @@ class Algorithm:
         self._signals = pd.Series(0.0, index=self.df_ticker.index, dtype=float)
 
     @abstractmethod
-    def __step__(self):
-        raise NotImplementedError("The `step` method must be implemented by subclasses.")
+    def __step__(self, time_idx: int):
+        self._current_time_idx = time_idx
 
     @abstractmethod
     def __setup__(self):
@@ -160,8 +160,16 @@ class Algorithm:
         self.__load_data__()
         self.__reset__()
         self.features = TimeseriesFeature(self.df_ticker)  # Initialize features with the full DataFrame
+        # Run the core trading algorithm (fills self._signals)
         self.__algorithm__()
-        self.__step__()
+        if not hasattr(self, "_signals") or self._signals is None:
+            raise ValueError("Trading signals (_signals) are not generated.")
+
+        # Step through each signal (buy/sell/hold) and simulate trading
+        for time_idx in range(len(self._signals)):
+            self.__step__(time_idx)
+
+        # Finalize (e.g., calculate metrics, save results)
         self.__done__()
 
     @classmethod

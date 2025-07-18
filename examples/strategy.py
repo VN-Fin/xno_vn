@@ -10,6 +10,7 @@ class MyAlgorithm(StockAlgorithm):
         self.from_time = "2020-01-01"
         self.to_time = "2025-07-04"
         self.init_cash = 500_000_000
+        self.slippage = 0.05
 
     def __algorithm__(self):
         # Indicators
