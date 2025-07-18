@@ -1,6 +1,6 @@
 
 import numpy as np
-from numpy.lib.stride_tricks import sliding_window_view
+from numba.np.arrayobj import sliding_window_view
 from scipy.stats import rankdata
 
 
