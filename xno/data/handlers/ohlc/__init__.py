@@ -1,4 +1,3 @@
-from abc import abstractmethod
 
 from xno import settings
 from xno.data.datasources.internal.ohlc import InternalOhlcDatasource

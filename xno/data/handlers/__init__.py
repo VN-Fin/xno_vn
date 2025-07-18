@@ -1,4 +1,4 @@
-# xquantesis/data/handlers/__init__.py
+# xno/data/handlers/__init__.py
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import List, Union, Any, Type, Optional

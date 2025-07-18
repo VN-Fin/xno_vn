@@ -3,8 +3,6 @@ from abc import ABC, abstractmethod
 import websocket
 from xno.config import settings
 from xno.data.datasources import BaseDataSource
-from xno.protoc.websocket_message_pb2 import StockOHLCVMessage
-import base64
 
 
 class PublicDataSource(BaseDataSource, ABC):

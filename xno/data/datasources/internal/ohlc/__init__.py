@@ -1,8 +1,4 @@
-# xquantesis/data/datasources/internal/ohlc/__init__.py
-import logging
-import threading
-from typing import Union
-
+# xno/data/datasources/internal/ohlc/__init__.py
 import pandas as pd
 from xno.data.datasources.internal import InternalDataSource
 

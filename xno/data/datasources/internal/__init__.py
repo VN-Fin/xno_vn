@@ -1,8 +1,7 @@
-# xquantesis/data/datasources/internal/__init__.py
+# xno/data/datasources/internal/__init__.py
 import json
 import logging
 from abc import ABC
-import threading
 from typing import Iterable, Union, List
 from tqdm import tqdm
 import pandas as pd

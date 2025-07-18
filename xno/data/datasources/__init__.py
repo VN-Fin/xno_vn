@@ -1,7 +1,7 @@
 import logging
 import threading
 from abc import abstractmethod, ABC
-from typing import Union, Iterable, List, Dict, Any
+from typing import Union, List, Dict, Any
 
 import pandas as pd
 
