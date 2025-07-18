@@ -1,4 +1,3 @@
-Here's your updated `README.md` with all mentions of `xquantesis` changed to `xno_vn`, and the quick start code adjusted accordingly.
 
 # xno_vn - The XNO-powered Quant Trading Toolkit built on Practical Wisdom.
 
