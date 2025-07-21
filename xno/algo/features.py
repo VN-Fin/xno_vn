@@ -456,3 +456,302 @@ class TimeseriesFeature:
             close = self.df_ticker['Close']  
         return xts.WCLPRICE(high, low, close)
 
+# STATISTIC 
+
+    def beta(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, timeperiod=5) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.BETA(series1, series2, timeperiod)
+
+    def correl(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.CORREL(series1, series2, timeperiod)
+
+    def linearreg(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.LINEARREG(series, timeperiod)
+
+    def linearreg_angle(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.LINEARREG_ANGLE(series, timeperiod)
+
+    def linearreg_intercept(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.LINEARREG_INTERCEPT(series, timeperiod)
+
+    def linearreg_slope(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.LINEARREG_SLOPE(series, timeperiod)
+
+    def stddev(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=5, nbdev=1) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.STDDEV(series, timeperiod, nbdev)
+
+    def tsf(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.TSF(series, timeperiod)
+
+    def var(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=5, nbdev=1) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.VAR(series, timeperiod, nbdev)
+
+# MATH TRANSFORM
+
+    def acos(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ACOS(series)
+
+    def asin(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ASIN(series)
+
+    def atan(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ATAN(series)
+
+    def ceil(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.CEIL(series)
+
+    def cos(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.COS(series)
+
+    def cosh(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.COSH(series)
+
+    def exp(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.EXP(series)
+
+    def floor(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.FLOOR(series)
+
+    def ln(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.LN(series)
+
+    def log10(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.LOG10(series)
+
+    def sin(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.SIN(series)
+
+    def sinh(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.SINH(series)
+
+    def sqrt(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.SQRT(series)
+
+    def tan(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.TAN(series)
+
+    def tanh(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.TANH(series)
+
+ # MATH 
+
+    def add(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.ADD(series1, series2)
+
+    def div(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.DIV(series1, series2)
+
+    def max(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.MAX(series, timeperiod)
+
+    def maxindex(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.MAXINDEX(series, timeperiod)
+
+    def min(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.MIN(series, timeperiod)
+
+    def minindex(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.MININDEX(series, timeperiod)
+
+    def minmax(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[Tuple[np.ndarray, np.ndarray], None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.MINMAX(series, timeperiod)
+
+    def minmaxindex(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[Tuple[np.ndarray, np.ndarray], None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.MINMAXINDEX(series, timeperiod)
+
+    def mult(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.MULT(series1, series2)
+
+    def sub(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.SUB(series1, series2)
+
+    def sum(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.SUM(series, timeperiod)
+
+# UTILITY & COMPARISON 
+
+    def cross(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.CROSS(series1, series2)
+
+    def above(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.ABOVE(series1, series2)
+
+    def below(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.BELOW(series1, series2)
+
+    def equal(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.EQUAL(series1, series2)
+
+    def not_equal(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.NOT_EQUAL(series1, series2)
+
+    def and_op(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.AND(series1, series2)
+
+    def or_op(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.OR(series1, series2)
+
+# ROLLING WINDOW 
+
+    def rolling_mean(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_MEAN(series, window)
+
+    def rolling_max(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_MAX(series, window)
+
+    def rolling_min(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_MIN(series, window)
+
+    def rolling_std(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_STD(series, window)
+
+    def rolling_sum(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_SUM(series, window)
+
+    def rolling_prod(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_PROD(series, window)
+
+    def rolling_rank(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_RANK(series, window)
+
+    def rolling_correlation(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.ROLLING_CORRELATION(series1, series2, window)
+
+    def rolling_covariance(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series1 is None:
+            series1 = self.df_ticker['High']  
+        if series2 is None:
+            series2 = self.df_ticker['Low']  
+        return xts.ROLLING_COVARIANCE(series1, series2, window)
+
+    def rolling_median(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
+        if series is None:
+            series = self.df_ticker['Close']  
+        return xts.ROLLING_MEDIAN(series, window)
