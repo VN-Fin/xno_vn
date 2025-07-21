@@ -78,9 +78,9 @@ class StockAlgorithm(Algorithm):
             logging.debug(f"Update T0, T1, T2 for {current_time}, T0: {self._t0_size}, T1: {self._t1_size}, T2: {self._t2_size}, Sell Position: {self._sell_size}")
             # Consecutive prev_day days
             self._sell_size += self._t2_size
-            self.t2_size = self._t1_size
-            self.t1_size = self._t0_size
-            self.t0_size = 0
+            self._t2_size = self._t1_size
+            self._t1_size = self._t0_size
+            self._t0_size = 0
 
         # Calculate the current action based on the signal
         if sig > 0:
@@ -101,7 +101,7 @@ class StockAlgorithm(Algorithm):
             logging.debug(f"Entering sell logic at {current_time} with weight {sig}")
             if self._sell_size == 0:
                 logging.warning(f"Sell position is 0, but trying to sell {sig} at {current_time}. This will be ignored, please waiting for the next timestamp to sell.")
-                self.pending_sell_pos += abs(sig)  # Track pending sell position
+                self._pending_sell_pos += abs(sig)  # Track pending sell position
             else:
                 can_sell_position = max(self._pending_sell_pos, abs(updated_position))
                 current_trade_size = min(
@@ -112,7 +112,7 @@ class StockAlgorithm(Algorithm):
                 self._current_open_size -= current_trade_size  # Update total shares held
                 current_signal = -can_sell_position
                 self._current_position -= can_sell_position
-                self.pending_sell_pos = max(self._pending_sell_pos - can_sell_position, 0)  # Reduce pending sell position
+                self._pending_sell_pos = max(self._pending_sell_pos - can_sell_position, 0)  # Reduce pending sell position
                 current_action = "S"  # Set action to sell
                 current_fee = current_price * current_trade_size * self._init_fee  # Calculate fee based on trade size
                 current_pnl -= current_fee
@@ -120,7 +120,7 @@ class StockAlgorithm(Algorithm):
             logging.debug(f"Entering buy logic at {current_time} with weight {sig}")
             self._current_position += updated_position  # Update current position
             current_trade_size = round_to_lot(updated_position * current_max_shares, self._stock_lot_size)
-            self.t0_size += current_trade_size  # Update T0 position
+            self._t0_size += current_trade_size  # Update T0 position
             self._current_open_size += current_trade_size  # Update total shares held
             current_action = "B"  # Set action to buy
             current_signal = updated_position  # Update current signal

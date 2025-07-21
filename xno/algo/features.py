@@ -1,9 +1,97 @@
 # Add ta-lib functions: https://ta-lib.org/functions/
-from typing import Union, Tuple
+from collections import namedtuple
+from functools import wraps
+from typing import Union
 
 import numpy as np
 import pandas as pd
 import xno.timeseries as xts
+from inspect import signature, isfunction
+
+
+TAInput = Union[np.ndarray, pd.Series, None]
+TAOutput = Union[np.ndarray, None]
+
+ARoonResult = namedtuple("ARoonResult", ["aroondown", "aroonup"])
+MAMAResult = namedtuple("MAMAResult", ["mama", "fama"])
+MACDResult = namedtuple("MACDResult", ["macd", "signal", "hist"])
+MACDEXTResult = namedtuple("MACDEXTResult", ["macd", "macdsignal", "macdhist"])
+MACDFixResult = namedtuple("MACDFixResult", ["macd", "macdsignal", "macdhist"])
+BBANDSResult = namedtuple("BBANDSResult", ["upperband", "middleband", "lowerband"])
+StochResult = namedtuple("StochResult", ["slowk", "slowd"])
+StochFResult = namedtuple("StochFResult", ["fastk", "fastd"])
+StochRsiResult = namedtuple("StochRsiResult", ["fastk", "fastd"])
+HtPhasorResult = namedtuple("HtPhasorResult", ["inphase", "quadrature"])
+HtSineResult = namedtuple("HtSineResult", ["sine", "leadsine"])
+KDJResult = namedtuple("KDResult", ["slowk", "slowd"])
+MinMaxResult = namedtuple("MinMaxResult", ["min", "max"])
+
+
+_DEFAULT_COLUMN_MAP = {
+    'open_': 'Open',
+    'high': 'High',
+    'low': 'Low',
+    'close': 'Close',
+    'volume': 'Volume',
+    'series': 'Close'  # Optional common alias
+}
+
+def autofill(_func=None, *, columns_map=None):
+    """
+    - Fills None args from self.df_ticker[column] using a name map
+    - Converts pd.Series to np.ndarray
+    - Supports default arg names like `open_`, `high`, `close`, etc.
+    """
+    columns_map = columns_map or _DEFAULT_COLUMN_MAP
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            sig = signature(func)
+            bound = sig.bind(self, *args, **kwargs)
+            bound.apply_defaults()
+
+            for arg_name in bound.arguments:
+                val = bound.arguments[arg_name]
+                if val is None and arg_name in columns_map:
+                    col = columns_map[arg_name]
+                    val = self.df_ticker[col]
+                if isinstance(val, pd.Series):
+                    val = val.values
+                bound.arguments[arg_name] = val
+
+            return func(*bound.args, **bound.kwargs)
+        return wrapper
+
+    if isfunction(_func):
+        return decorator(_func)
+    return decorator
+
+
+def auto_numpy(func):
+    """
+    - Converts pd.Series to np.ndarray
+    - Converts np.int64 / np.float64 to native int / float for Numba compatibility
+    """
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        sig = signature(func)
+        bound = sig.bind(self, *args, **kwargs)
+        bound.apply_defaults()
+
+        for k, v in bound.arguments.items():
+            if isinstance(v, pd.Series):
+                bound.arguments[k] = v.values
+            elif isinstance(v, (np.integer, np.int_)):
+                bound.arguments[k] = int(v)
+            elif isinstance(v, (np.floating, np.float_)):
+                bound.arguments[k] = float(v)
+
+        return func(*bound.args, **bound.kwargs)
+
+    return wrapper
+
+
 
 class TimeseriesFeature:
     def __init__(self, df: pd.DataFrame):
@@ -12,746 +100,600 @@ class TimeseriesFeature:
         """
         self.df_ticker = df
 
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
     def adx(
-            self,
-            series1: Union[np.ndarray, pd.Series, None] = None,
-            series2: Union[np.ndarray, pd.Series, None] = None,
-            series3: Union[np.ndarray, pd.Series, None] = None,
-            timeperiod=14
-    ) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        if series3 is None:
-            series3 = self.df_ticker['Close']  
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod=14
+    ) -> TAOutput:
+        return xts.ADX(high, low, close, timeperiod)
 
-        return xts.ADX(series1, series2, series3, timeperiod)
+    @autofill(columns_map={"close": "Close"})
+    def sma(self, Close: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.SMA(Close, timeperiod)
 
-    def sma(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.SMA(series, timeperiod)
+    @autofill(columns_map={"close": "Close"})
+    def macd(self, close: TAInput = None, fastperiod=12, slowperiod=26, signalperiod=9) -> MACDResult:
+        macd, signal, hist = xts.MACD(close, fastperiod, slowperiod, signalperiod)
+        return MACDResult(macd, signal, hist)
 
-    def macd(self, series: Union[np.ndarray, pd.Series, None] = None, fastperiod=12, slowperiod=26, signalperiod=9) -> Union[tuple, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MACD(series, fastperiod, slowperiod, signalperiod)
+    @autofill(columns_map={"close": "Close"})
+    def roc(self, close: TAInput = None, timeperiod=10) -> TAOutput:
+        return xts.ROC(close, timeperiod)
 
-    def roc(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=10) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROC(series, timeperiod)
+    @autofill(columns_map={"close": "Close"})
+    def lag(self, close: TAInput = None, periods=1) -> TAOutput:
+        return xts.LAG(close, periods)
 
-    def lag(self, series: Union[np.ndarray, pd.Series, None] = None, periods=1) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.LAG(series, periods)
+    @autofill
+    def rsi(self, close: TAInput = None, timeperiod=14) -> TAOutput:
+        return xts.RSI(close, timeperiod)
 
-    def rsi(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.RSI(series, timeperiod)
+    @autofill(columns_map={"close": "Close", "volume": "Volume"})
+    def obv(self, close: TAInput = None, volume: TAInput = None) -> TAOutput:
+        return xts.OBV(close, volume)
 
-    def obv(self, series: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        if series2 is None:
-            series2 = self.df_ticker['Volume']  
-        return xts.OBV(series, series2)
+    @autofill(columns_map={"close": "Close"})
+    def bbands(
+        self,
+        close: TAInput = None,
+        timeperiod=5,
+        nbdevup=2,
+        nbdevdn=2,
+        matype=0,
+    ) -> BBANDSResult:
+        upperband, middleband, lowerband = xts.BBANDS(
+            close, timeperiod, nbdevup, nbdevdn, matype
+        )
+        return BBANDSResult(upperband, middleband, lowerband)
 
-# OVERLAP 
-
-    def bbands(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=5, nbdevup=2, nbdevdn=2, matype=0) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.BBANDS(series, timeperiod, nbdevup, nbdevdn, matype)
-
-    def dema(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def dema(self, series: TAInput = None, timeperiod=30) -> TAOutput:
         return xts.DEMA(series, timeperiod)
 
-    def ema(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def ema(self, series: TAInput = None, timeperiod=30) -> TAOutput:
         return xts.EMA(series, timeperiod)
 
-    def ht_trendline(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def ht_trendline(self, series: TAInput = None) -> TAOutput:
         return xts.HT_TRENDLINE(series)
 
-    def kama(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def kama(self, series: TAInput = None, timeperiod=30) -> TAOutput:
         return xts.KAMA(series, timeperiod)
 
-    def ma(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30, matype=0) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def ma(self, series: TAInput = None, timeperiod=30, matype=0) -> TAOutput:
         return xts.MA(series, timeperiod, matype)
 
-    def mama(self, series: Union[np.ndarray, pd.Series, None] = None, fastlimit=0, slowlimit=0) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def mama(self, series: TAInput = None, fastlimit=0, slowlimit=0) -> MAMAResult:
         return xts.MAMA(series, fastlimit, slowlimit)
 
-    def mavp(self, series: Union[np.ndarray, pd.Series, None] = None, periods: Union[np.ndarray, pd.Series, None] = None, minperiod=2, maxperiod=30, matype=0) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close", "periods": None})
+    def mavp(
+        self,
+        series: TAInput = None,
+        periods: TAInput = None,
+        minperiod=2,
+        maxperiod=30,
+        matype=0,
+    ) -> TAOutput:
         if periods is None:
-            periods = np.full(len(series), 14)  
+            periods = np.full(series.size, 14)
         return xts.MAVP(series, periods, minperiod, maxperiod, matype)
 
-    def midpoint(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def midpoint(self, series: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.MIDPOINT(series, timeperiod)
 
-    def midprice(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def midprice(self, high: TAInput = None, low: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.MIDPRICE(high, low, timeperiod)
 
-    def sar(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, acceleration=0, maximum=0) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def sar(self, high: TAInput = None, low: TAInput = None, acceleration=0, maximum=0) -> TAOutput:
         return xts.SAR(high, low, acceleration, maximum)
 
-    def sarext(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, startvalue=0, offsetonreverse=0, accelerationinitlong=0, accelerationlong=0, accelerationmaxlong=0, accelerationinitshort=0, accelerationshort=0, accelerationmaxshort=0) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        return xts.SAREXT(high, low, startvalue, offsetonreverse, accelerationinitlong, accelerationlong, accelerationmaxlong, accelerationinitshort, accelerationshort, accelerationmaxshort)
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def sarext(
+            self,
+            high: TAInput = None,
+            low: TAInput = None,
+            startvalue=0,
+            offsetonreverse=0,
+            accelerationinitlong=0,
+            accelerationlong=0,
+            accelerationmaxlong=0,
+            accelerationinitshort=0,
+            accelerationshort=0,
+            accelerationmaxshort=0,
+    ) -> TAOutput:
+        return xts.SAREXT(
+            high, low,
+            startvalue, offsetonreverse,
+            accelerationinitlong, accelerationlong, accelerationmaxlong,
+            accelerationinitshort, accelerationshort, accelerationmaxshort
+        )
 
-    def t3(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=5, vfactor=0) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def t3(self, series: TAInput = None, timeperiod=5, vfactor=0) -> TAOutput:
         return xts.T3(series, timeperiod, vfactor)
 
-    def tema(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def tema(self, series: TAInput = None, timeperiod=30) -> TAOutput:
         return xts.TEMA(series, timeperiod)
 
-    def trima(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def trima(self, series: TAInput = None, timeperiod=30) -> TAOutput:
         return xts.TRIMA(series, timeperiod)
 
-    def wma(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def wma(self, series: TAInput = None, timeperiod=30) -> TAOutput:
         return xts.WMA(series, timeperiod)
 
-# MOMENTUM 
-
-    def adxr(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def adxr(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod=14
+    ) -> TAOutput:
         return xts.ADXR(high, low, close, timeperiod)
 
-    def apo(self, series: Union[np.ndarray, pd.Series, None] = None, fastperiod=12, slowperiod=26, matype=0) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def apo(self, series: TAInput = None, fastperiod=12, slowperiod=26, matype=0) -> TAOutput:
         return xts.APO(series, fastperiod, slowperiod, matype)
 
-    def aroon(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        return xts.AROON(high, low, timeperiod)
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def aroon(self, high: TAInput = None, low: TAInput = None, timeperiod=14) -> ARoonResult:
+        return ARoonResult(*xts.AROON(high, low, timeperiod))
 
-    def aroonosc(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def aroonosc(self, high: TAInput = None, low: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.AROONOSC(high, low, timeperiod)
 
-    def bop(self, open_: Union[np.ndarray, pd.Series, None] = None, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if open_ is None:
-            open_ = self.df_ticker['Open']  
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"open_": "Open", "high": "High", "low": "Low", "close": "Close"})
+    def bop(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
         return xts.BOP(open_, high, low, close)
 
-    def cci(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def cci(self, high: TAInput = None, low: TAInput = None, close: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.CCI(high, low, close, timeperiod)
 
-    def cmo(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def cmo(self, series: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.CMO(series, timeperiod)
 
-    def dx(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def dx(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod=14
+    ) -> TAOutput:
         return xts.DX(high, low, close, timeperiod)
 
-    def macdext(self, series: Union[np.ndarray, pd.Series, None] = None, fastperiod=12, fastmatype=0, slowperiod=26, slowmatype=0, signalperiod=9, signalmatype=0) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MACDEXT(series, fastperiod, fastmatype, slowperiod, slowmatype, signalperiod, signalmatype)
+    @autofill(columns_map={"series": "Close"})
+    def macdext(
+        self,
+        series: TAInput = None,
+        fastperiod=12,
+        fastmatype=0,
+        slowperiod=26,
+        slowmatype=0,
+        signalperiod=9,
+        signalmatype=0
+    ) -> MACDEXTResult:
+        macd, signal, hist = xts.MACDEXT(series, fastperiod, fastmatype, slowperiod, slowmatype, signalperiod, signalmatype)
+        return MACDEXTResult(macd, signal, hist)
 
-    def macdfix(self, series: Union[np.ndarray, pd.Series, None] = None, signalperiod=9) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MACDFIX(series, signalperiod)
+    @autofill(columns_map={"series": "Close"})
+    def macdfix(
+        self,
+        series: TAInput = None,
+        signalperiod=9
+    ) -> MACDFixResult:
+        macd, signal, hist = xts.MACDFIX(series, signalperiod)
+        return MACDFixResult(macd, signal, hist)
 
-    def mfi(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, volume: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
-        if volume is None:
-            volume = self.df_ticker['Volume']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close", "volume": "Volume"})
+    def mfi(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        volume: TAInput = None,
+        timeperiod=14
+    ) -> TAOutput:
         return xts.MFI(high, low, close, volume, timeperiod)
 
-    def minus_di(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def minus_di(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod=14
+    ) -> TAOutput:
         return xts.MINUS_DI(high, low, close, timeperiod)
 
-    def minus_dm(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def minus_dm(self, high: TAInput = None, low: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.MINUS_DM(high, low, timeperiod)
 
-    def mom(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=10) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def mom(self, series: TAInput = None, timeperiod=10) -> TAOutput:
         return xts.MOM(series, timeperiod)
 
-    def plus_di(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def plus_di(self, high: TAInput = None, low: TAInput = None, close: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.PLUS_DI(high, low, close, timeperiod)
 
-    def plus_dm(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def plus_dm(self, high: TAInput = None, low: TAInput = None, timeperiod=14) -> TAOutput:
         return xts.PLUS_DM(high, low, timeperiod)
 
-    def ppo(self, series: Union[np.ndarray, pd.Series, None] = None, fastperiod=12, slowperiod=26, matype=0) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def ppo(self, series: TAInput = None, fastperiod=12, slowperiod=26, matype=0) -> TAOutput:
         return xts.PPO(series, fastperiod, slowperiod, matype)
 
-    def rocp(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=10) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def rocp(self, series: TAInput = None, timeperiod=10) -> TAOutput:
         return xts.ROCP(series, timeperiod)
 
-    def rocr(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=10) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def rocr(self, series: TAInput = None, timeperiod=10) -> TAOutput:
         return xts.ROCR(series, timeperiod)
 
-    def rocr100(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=10) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
+    @autofill(columns_map={"series": "Close"})
+    def rocr100(self, series: TAInput = None, timeperiod=10) -> TAOutput:
         return xts.ROCR100(series, timeperiod)
 
-    def stoch(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, fastk_period=5, slowk_period=3, slowk_matype=0, slowd_period=3, slowd_matype=0) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
-        return xts.STOCH(high, low, close, fastk_period, slowk_period, slowk_matype, slowd_period, slowd_matype)
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def stoch(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        fastk_period=5,
+        slowk_period=3,
+        slowk_matype=0,
+        slowd_period=3,
+        slowd_matype=0
+    ) -> StochResult:
+        slowk, slowd = xts.STOCH(high, low, close, fastk_period, slowk_period, slowk_matype, slowd_period, slowd_matype)
+        return StochResult(slowk, slowd)
 
-    def stochf(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, fastk_period=5, fastd_period=3, fastd_matype=0) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
-        return xts.STOCHF(high, low, close, fastk_period, fastd_period, fastd_matype)
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def stochf(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        fastk_period=5,
+        fastd_period=3,
+        fastd_matype=0
+    ) -> StochFResult:
+        fastk, fastd = xts.STOCHF(high, low, close, fastk_period, fastd_period, fastd_matype)
+        return StochFResult(fastk, fastd)
 
-    def stochrsi(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14, fastk_period=5, fastd_period=3, fastd_matype=0) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.STOCHRSI(series, timeperiod, fastk_period, fastd_period, fastd_matype)
+    @autofill(columns_map={"series": "Close"})
+    def stochrsi(
+        self,
+        series: TAInput = None,
+        timeperiod=14,
+        fastk_period=5,
+        fastd_period=3,
+        fastd_matype=0
+    ) -> StochRsiResult:
+        fastk, fastd = xts.STOCHRSI(series, timeperiod, fastk_period, fastd_period, fastd_matype)
+        return StochRsiResult(fastk, fastd)
 
-    def trix(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.TRIX(series, timeperiod)
+    @autofill(columns_map={"close": "Close"})
+    def trix(self, close: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.TRIX(close, timeperiod)
 
-    def ultosc(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod1=7, timeperiod2=14, timeperiod3=28) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def ultosc(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod1=7,
+        timeperiod2=14,
+        timeperiod3=28,
+    ) -> TAOutput:
         return xts.ULTOSC(high, low, close, timeperiod1, timeperiod2, timeperiod3)
 
-    def willr(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def willr(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod=14,
+    ) -> TAOutput:
         return xts.WILLR(high, low, close, timeperiod)
 
-# VOLUME 
-
-    def ad(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, volume: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
-        if volume is None:
-            volume = self.df_ticker['Volume']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close", "volume": "Volume"})
+    def ad(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        volume: TAInput = None
+    ) -> TAOutput:
         return xts.AD(high, low, close, volume)
 
-    def adosc(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, volume: Union[np.ndarray, pd.Series, None] = None, fastperiod=3, slowperiod=10) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
-        if volume is None:
-            volume = self.df_ticker['Volume']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close", "volume": "Volume"})
+    def adosc(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        volume: TAInput = None,
+        fastperiod=3,
+        slowperiod=10
+    ) -> TAOutput:
         return xts.ADOSC(high, low, close, volume, fastperiod, slowperiod)
 
-# VOLATILITY 
-
-    def atr(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def atr(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod: int = 14
+    ) -> TAOutput:
         return xts.ATR(high, low, close, timeperiod)
 
-    def natr(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def natr(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None,
+        timeperiod: int = 14
+    ) -> TAOutput:
         return xts.NATR(high, low, close, timeperiod)
 
-    def trange(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def trange(
+        self,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None
+    ) -> TAOutput:
         return xts.TRANGE(high, low, close)
 
-# CYCLE 
+    @autofill(columns_map={"close": "Close"})
+    def ht_dcperiod(self, close: TAInput = None) -> TAOutput:
+        return xts.HT_DCPERIOD(close)
 
-    def ht_dcperiod(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.HT_DCPERIOD(series)
+    @autofill(columns_map={"close": "Close"})
+    def ht_dcphase(self, close: TAInput = None) -> TAOutput:
+        return xts.HT_DCPHASE(close)
 
-    def ht_dcphase(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.HT_DCPHASE(series)
+    @autofill(columns_map={"close": "Close"})
+    def ht_phasor(self, close: TAInput = None) -> HtPhasorResult:
+        inphase, quadrature = xts.HT_PHASOR(close)
+        return HtPhasorResult(inphase, quadrature)
 
-    def ht_phasor(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.HT_PHASOR(series)
+    @autofill(columns_map={"close": "Close"})
+    def ht_sine(self, close: TAInput) -> HtSineResult:
+        sine, leadsine = xts.HT_SINE(close)
+        return HtSineResult(sine, leadsine)
 
-    def ht_sine(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.HT_SINE(series)
+    @autofill(columns_map={"close": "Close"})
+    def ht_trendmode(self, close: TAInput = None) -> TAOutput:
+        return xts.HT_TRENDMODE(close)
 
-    def ht_trendmode(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.HT_TRENDMODE(series)
-
-# PRICE 
-
-    def avgprice(self, open_: Union[np.ndarray, pd.Series, None] = None, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if open_ is None:
-            open_ = self.df_ticker['Open']  
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"open_": "Open", "high": "High", "low": "Low", "close": "Close"})
+    def avgprice(
+        self,
+        open_: TAInput = None,
+        high: TAInput = None,
+        low: TAInput = None,
+        close: TAInput = None
+    ) -> TAOutput:
         return xts.AVGPRICE(open_, high, low, close)
 
-    def medprice(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
+    @autofill(columns_map={"high": "High", "low": "Low"})
+    def medprice(self, high: TAInput = None, low: TAInput = None) -> TAOutput:
         return xts.MEDPRICE(high, low)
 
-    def typprice(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def typprice(self, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
         return xts.TYPPRICE(high, low, close)
 
-    def wclprice(self, high: Union[np.ndarray, pd.Series, None] = None, low: Union[np.ndarray, pd.Series, None] = None, close: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if high is None:
-            high = self.df_ticker['High']  
-        if low is None:
-            low = self.df_ticker['Low']  
-        if close is None:
-            close = self.df_ticker['Close']  
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close"})
+    def wclprice(self, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
         return xts.WCLPRICE(high, low, close)
 
-# STATISTIC 
+    # Mathematical Functions
+    @auto_numpy
+    def beta(self, s1: TAInput, s2: TAOutput, timeperiod=5) -> TAOutput:
+        return xts.BETA(s1, s2, timeperiod)
 
-    def beta(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, timeperiod=5) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.BETA(series1, series2, timeperiod)
+    @auto_numpy
+    def correl(self, s1: TAInput, s2: TAOutput, timeperiod=30) -> TAOutput:
+        return xts.CORREL(s1, s2, timeperiod)
 
-    def correl(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.CORREL(series1, series2, timeperiod)
+    @auto_numpy
+    def linearreg(self, s1: TAInput, timeperiod=14) -> TAOutput:
+        return xts.LINEARREG(s1, timeperiod)
 
-    def linearreg(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.LINEARREG(series, timeperiod)
+    @auto_numpy
+    def linearreg_angle(self, s1: TAInput, timeperiod=14) -> TAOutput:
+        return xts.LINEARREG_ANGLE(s1, timeperiod)
 
-    def linearreg_angle(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.LINEARREG_ANGLE(series, timeperiod)
+    @auto_numpy
+    def linearreg_intercept(self, s1: TAInput, timeperiod=14) -> TAOutput:
+        return xts.LINEARREG_INTERCEPT(s1, timeperiod)
 
-    def linearreg_intercept(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.LINEARREG_INTERCEPT(series, timeperiod)
+    @auto_numpy
+    def linearreg_slope(self, s1: TAInput, timeperiod=14) -> TAOutput:
+        return xts.LINEARREG_SLOPE(s1, timeperiod)
 
-    def linearreg_slope(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.LINEARREG_SLOPE(series, timeperiod)
+    @auto_numpy
+    def stddev(self, s1: TAInput = None, timeperiod=5, nbdev=1) -> TAOutput:
+        return xts.STDDEV(s1, timeperiod, nbdev)
 
-    def stddev(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=5, nbdev=1) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.STDDEV(series, timeperiod, nbdev)
+    @auto_numpy
+    def tsf(self, s1: TAInput = None, timeperiod=14) -> TAOutput:
+        return xts.TSF(s1, timeperiod)
 
-    def tsf(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=14) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.TSF(series, timeperiod)
+    @auto_numpy
+    def var(self, s1: TAInput = None, timeperiod=5, nbdev=1) -> TAOutput:
+        return xts.VAR(s1, timeperiod, nbdev)
 
-    def var(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=5, nbdev=1) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.VAR(series, timeperiod, nbdev)
+    @auto_numpy
+    def acos(self, s1: TAInput = None) -> TAOutput:
+        return xts.ACOS(s1)
 
-# MATH TRANSFORM
+    @auto_numpy
+    def asin(self, s1: TAInput = None) -> TAOutput:
+        return xts.ASIN(s1)
 
-    def acos(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ACOS(series)
+    @auto_numpy
+    def atan(self, s1: TAInput = None) -> TAOutput:
+        return xts.ATAN(s1)
 
-    def asin(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ASIN(series)
+    @auto_numpy
+    def ceil(self, s1: TAInput = None) -> TAOutput:
+        return xts.CEIL(s1)
 
-    def atan(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ATAN(series)
+    @auto_numpy
+    def cos(self, s1: TAInput = None) -> TAOutput:
+        return xts.COS(s1)
 
-    def ceil(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.CEIL(series)
+    @auto_numpy
+    def cosh(self, s1: TAInput = None) -> TAOutput:
+        return xts.COSH(s1)
 
-    def cos(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.COS(series)
+    @auto_numpy
+    def exp(self, s1: TAInput = None) -> TAOutput:
+        return xts.EXP(s1)
 
-    def cosh(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.COSH(series)
+    @auto_numpy
+    def floor(self, s1: TAInput = None) -> TAOutput:
+        return xts.FLOOR(s1)
 
-    def exp(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.EXP(series)
+    @auto_numpy
+    def ln(self, s1: TAInput = None) -> TAOutput:
+        return xts.LN(s1)
 
-    def floor(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.FLOOR(series)
+    @auto_numpy
+    def log10(self, s1: TAInput = None) -> TAOutput:
+        return xts.LOG10(s1)
 
-    def ln(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.LN(series)
+    @auto_numpy
+    def sin(self, s1: TAInput = None) -> TAOutput:
+        return xts.SIN(s1)
 
-    def log10(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.LOG10(series)
+    @auto_numpy
+    def sinh(self, s1: TAInput = None) -> TAOutput:
+        return xts.SINH(s1)
 
-    def sin(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.SIN(series)
+    @auto_numpy
+    def sqrt(self, s1: TAInput = None) -> TAOutput:
+        return xts.SQRT(s1)
 
-    def sinh(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.SINH(series)
+    @auto_numpy
+    def tan(self, s1: TAInput = None) -> TAOutput:
+        return xts.TAN(s1)
 
-    def sqrt(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.SQRT(series)
+    @auto_numpy
+    def tanh(self, s1: TAInput = None) -> TAOutput:
+        return xts.TANH(s1)
 
-    def tan(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.TAN(series)
+    @auto_numpy
+    def add(self, s1: TAInput, s2: TAInput) -> Union[np.ndarray, None]:
+        return xts.ADD(s1, s2)
 
-    def tanh(self, series: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.TANH(series)
+    @auto_numpy
+    def div(self, s1: TAInput, s2: TAInput) -> TAOutput:
+        return xts.DIV(s1, s2)
 
- # MATH 
+    @auto_numpy
+    def max(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.MAX(s1, timeperiod)
 
-    def add(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.ADD(series1, series2)
+    @auto_numpy
+    def maxindex(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.MAXINDEX(s1, timeperiod)
 
-    def div(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.DIV(series1, series2)
+    @auto_numpy
+    def min(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.MIN(s1, timeperiod)
 
-    def max(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MAX(series, timeperiod)
+    @auto_numpy
+    def minindex(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.MININDEX(s1, timeperiod)
 
-    def maxindex(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MAXINDEX(series, timeperiod)
+    @auto_numpy
+    def minmax(self, s1: TAInput = None, timeperiod=30) -> MinMaxResult:
+        min_, max_ = xts.MINMAX(s1, timeperiod)
+        return MinMaxResult(min_, max_)
 
-    def min(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MIN(series, timeperiod)
+    @auto_numpy
+    def minmaxindex(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.MINMAXINDEX(s1, timeperiod)
 
-    def minindex(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MININDEX(series, timeperiod)
+    @auto_numpy
+    def mult(self, s1: TAInput = None, s2: TAInput = None) -> TAOutput:
+        return xts.MULT(s1, s2)
 
-    def minmax(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MINMAX(series, timeperiod)
+    @auto_numpy
+    def sub(self, s1: TAInput = None, s2: TAInput = None) -> TAOutput:
+        return xts.SUB(s1, s2)
 
-    def minmaxindex(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[Tuple[np.ndarray, np.ndarray], None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.MINMAXINDEX(series, timeperiod)
+    @auto_numpy
+    def sum(self, s1: TAInput, timeperiod=30) -> TAOutput:
+        return xts.SUM(s1, timeperiod)
 
-    def mult(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.MULT(series1, series2)
+    @auto_numpy
+    def rolling_mean(self, s1: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_MEAN(s1, window)
 
-    def sub(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.SUB(series1, series2)
+    @auto_numpy
+    def rolling_max(self, s1: TAInput, window=20) -> TAOutput:
+        return xts.ROLLING_MAX(s1, window)
 
-    def sum(self, series: Union[np.ndarray, pd.Series, None] = None, timeperiod=30) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.SUM(series, timeperiod)
+    @auto_numpy
+    def rolling_min(self, s1: TAInput, window=20) -> TAOutput:
+        return xts.ROLLING_MIN(s1, window)
 
-# UTILITY & COMPARISON 
+    @auto_numpy
+    def rolling_std(self, s1: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_STD(s1, window)
 
-    def cross(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.CROSS(series1, series2)
+    @auto_numpy
+    def rolling_sum(self, s1: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_SUM(s1, window)
 
-    def above(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.ABOVE(series1, series2)
+    @auto_numpy
+    def rolling_prod(self, s1: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_PROD(s1, window)
 
-    def below(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.BELOW(series1, series2)
+    @auto_numpy
+    def rolling_rank(self, s1: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_RANK(s1, window)
 
-    def equal(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.EQUAL(series1, series2)
+    @auto_numpy
+    def rolling_correlation(self, s1: TAInput = None, s2: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_CORRELATION(s1, s2, window)
 
-    def not_equal(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.NOT_EQUAL(series1, series2)
+    @auto_numpy
+    def rolling_covariance(self, s1: TAInput = None, s2: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_COVARIANCE(s1, s2, window)
 
-    def and_op(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.AND(series1, series2)
-
-    def or_op(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.OR(series1, series2)
-
-# ROLLING WINDOW 
-
-    def rolling_mean(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_MEAN(series, window)
-
-    def rolling_max(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_MAX(series, window)
-
-    def rolling_min(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_MIN(series, window)
-
-    def rolling_std(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_STD(series, window)
-
-    def rolling_sum(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_SUM(series, window)
-
-    def rolling_prod(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_PROD(series, window)
-
-    def rolling_rank(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_RANK(series, window)
-
-    def rolling_correlation(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.ROLLING_CORRELATION(series1, series2, window)
-
-    def rolling_covariance(self, series1: Union[np.ndarray, pd.Series, None] = None, series2: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series1 is None:
-            series1 = self.df_ticker['High']  
-        if series2 is None:
-            series2 = self.df_ticker['Low']  
-        return xts.ROLLING_COVARIANCE(series1, series2, window)
-
-    def rolling_median(self, series: Union[np.ndarray, pd.Series, None] = None, window=20) -> Union[np.ndarray, None]:
-        if series is None:
-            series = self.df_ticker['Close']  
-        return xts.ROLLING_MEDIAN(series, window)
+    @auto_numpy
+    def rolling_median(self, s1: TAInput = None, window=20) -> TAOutput:
+        return xts.ROLLING_MEDIAN(s1, window)

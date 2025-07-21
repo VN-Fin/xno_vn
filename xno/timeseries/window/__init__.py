@@ -18,21 +18,13 @@ __all__ = [
 ]
 
 def rolling_apply(x, window, func, **kwargs):
-    """
-    Apply a function over a rolling window.
-    Args:
-        x (array-like): Input array.
-        window (int): Size of the rolling window.
-        func (callable): Function to apply over the rolling window.
-        **kwargs: Additional keyword arguments to pass to the function.
-    """
     x = np.asarray(x, dtype=float)
     n = len(x)
     if window > n or window < 1:
         return np.full_like(x, np.nan, dtype=float)
 
-    view = sliding_window_view(x, window)
-    result = np.array([func(window_slice, **kwargs) for window_slice in view], dtype=float)
+    view = np.lib.stride_tricks.sliding_window_view(x, window)
+    result = np.array([func(win, **kwargs) for win in view], dtype=float)
     padded = np.full(n, np.nan, dtype=float)
     padded[window - 1:] = result
     return padded

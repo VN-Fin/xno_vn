@@ -84,6 +84,9 @@ class StrategyVisualizer:
         # Sell markers
         sell_df = df[df['action'] == 'S'].copy()
         sell_df['time_str'] = sell_df.index.strftime('%Y-%m-%d %H:%M:%S')
+        amount_str = sell_df['amount'].apply(lambda x: f"{x:.2f}")
+        fee_str = sell_df['fee'].apply(lambda x: f"{x:.2f}")
+        price_str = sell_df['price'].apply(lambda x: f"{x:.2f}")
         fig.add_trace(go.Scatter(
             x=sell_df.index, y=sell_df['price'], mode='markers', name='Sell',
             marker=dict(symbol='triangle-down', color='red', size=10),
