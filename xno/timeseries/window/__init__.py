@@ -5,6 +5,7 @@ from scipy.stats import rankdata
 
 
 __all__ = [
+    'ROLLING_WINDOW',
     'ROLLING_MEAN',
     'ROLLING_MAX',
     'ROLLING_MIN',
@@ -28,6 +29,19 @@ def rolling_apply(x, window, func, **kwargs):
     padded = np.full(n, np.nan, dtype=float)
     padded[window - 1:] = result
     return padded
+
+
+def ROLLING_WINDOW(x, window):
+    """
+    Create a rolling window view of the input array.
+    Args:
+        x (array-like): Input array.
+        window (int): Size of the rolling window.
+    Returns:
+        numpy.ndarray: Array with rolling windows.
+    """
+    x = np.asarray(x, dtype=float)
+    return sliding_window_view(x, window)
 
 
 def ROLLING_MEAN(x, window):

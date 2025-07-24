@@ -135,6 +135,20 @@ class TimeseriesFeature:
     def obv(self, close: TAInput = None, volume: TAInput = None) -> TAOutput:
         return xts.OBV(close, volume)
 
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close", "volume": "Volume"})
+    def vwap(self, high: TAInput, low: TAInput, close: TAInput, volume: TAInput) -> TAOutput:
+        """
+        Calculate the Volume Weighted Average Price (VWAP).
+        """
+        return xts.VWAP(high, low, close, volume)
+
+    @autofill(columns_map={"high": "High", "low": "Low", "close": "Close", "volume": "Volume"})
+    def rolling_vwap(self, high: TAInput, low: TAInput, close: TAInput, volume: TAInput, window=20) -> TAOutput:
+        """
+        Calculate the rolling Volume Weighted Average Price (VWAP) over a specified window.
+        """
+        return xts.ROLLING_VWAP(high, low, close, volume, window)
+
     @autofill(columns_map={"close": "Close"})
     def bbands(
         self,
@@ -542,75 +556,75 @@ class TimeseriesFeature:
         return xts.LINEARREG_SLOPE(s1, timeperiod)
 
     @auto_numpy
-    def stddev(self, s1: TAInput = None, timeperiod=5, nbdev=1) -> TAOutput:
+    def stddev(self, s1: TAInput, timeperiod=5, nbdev=1) -> TAOutput:
         return xts.STDDEV(s1, timeperiod, nbdev)
 
     @auto_numpy
-    def tsf(self, s1: TAInput = None, timeperiod=14) -> TAOutput:
+    def tsf(self, s1: TAInput, timeperiod=14) -> TAOutput:
         return xts.TSF(s1, timeperiod)
 
     @auto_numpy
-    def var(self, s1: TAInput = None, timeperiod=5, nbdev=1) -> TAOutput:
+    def var(self, s1: TAInput, timeperiod=5, nbdev=1) -> TAOutput:
         return xts.VAR(s1, timeperiod, nbdev)
 
     @auto_numpy
-    def acos(self, s1: TAInput = None) -> TAOutput:
+    def acos(self, s1: TAInput) -> TAOutput:
         return xts.ACOS(s1)
 
     @auto_numpy
-    def asin(self, s1: TAInput = None) -> TAOutput:
+    def asin(self, s1: TAInput) -> TAOutput:
         return xts.ASIN(s1)
 
     @auto_numpy
-    def atan(self, s1: TAInput = None) -> TAOutput:
+    def atan(self, s1: TAInput) -> TAOutput:
         return xts.ATAN(s1)
 
     @auto_numpy
-    def ceil(self, s1: TAInput = None) -> TAOutput:
+    def ceil(self, s1: TAInput) -> TAOutput:
         return xts.CEIL(s1)
 
     @auto_numpy
-    def cos(self, s1: TAInput = None) -> TAOutput:
+    def cos(self, s1: TAInput) -> TAOutput:
         return xts.COS(s1)
 
     @auto_numpy
-    def cosh(self, s1: TAInput = None) -> TAOutput:
+    def cosh(self, s1: TAInput) -> TAOutput:
         return xts.COSH(s1)
 
     @auto_numpy
-    def exp(self, s1: TAInput = None) -> TAOutput:
+    def exp(self, s1: TAInput) -> TAOutput:
         return xts.EXP(s1)
 
     @auto_numpy
-    def floor(self, s1: TAInput = None) -> TAOutput:
+    def floor(self, s1: TAInput) -> TAOutput:
         return xts.FLOOR(s1)
 
     @auto_numpy
-    def ln(self, s1: TAInput = None) -> TAOutput:
+    def ln(self, s1: TAInput) -> TAOutput:
         return xts.LN(s1)
 
     @auto_numpy
-    def log10(self, s1: TAInput = None) -> TAOutput:
+    def log10(self, s1: TAInput) -> TAOutput:
         return xts.LOG10(s1)
 
     @auto_numpy
-    def sin(self, s1: TAInput = None) -> TAOutput:
+    def sin(self, s1: TAInput) -> TAOutput:
         return xts.SIN(s1)
 
     @auto_numpy
-    def sinh(self, s1: TAInput = None) -> TAOutput:
+    def sinh(self, s1: TAInput) -> TAOutput:
         return xts.SINH(s1)
 
     @auto_numpy
-    def sqrt(self, s1: TAInput = None) -> TAOutput:
+    def sqrt(self, s1: TAInput) -> TAOutput:
         return xts.SQRT(s1)
 
     @auto_numpy
-    def tan(self, s1: TAInput = None) -> TAOutput:
+    def tan(self, s1: TAInput) -> TAOutput:
         return xts.TAN(s1)
 
     @auto_numpy
-    def tanh(self, s1: TAInput = None) -> TAOutput:
+    def tanh(self, s1: TAInput) -> TAOutput:
         return xts.TANH(s1)
 
     @auto_numpy
@@ -622,36 +636,36 @@ class TimeseriesFeature:
         return xts.DIV(s1, s2)
 
     @auto_numpy
-    def max(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+    def max(self, s1: TAInput, timeperiod=30) -> TAOutput:
         return xts.MAX(s1, timeperiod)
 
     @auto_numpy
-    def maxindex(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+    def maxindex(self, s1: TAInput, timeperiod=30) -> TAOutput:
         return xts.MAXINDEX(s1, timeperiod)
 
     @auto_numpy
-    def min(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+    def min(self, s1: TAInput, timeperiod=30) -> TAOutput:
         return xts.MIN(s1, timeperiod)
 
     @auto_numpy
-    def minindex(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+    def minindex(self, s1: TAInput, timeperiod=30) -> TAOutput:
         return xts.MININDEX(s1, timeperiod)
 
     @auto_numpy
-    def minmax(self, s1: TAInput = None, timeperiod=30) -> MinMaxResult:
+    def minmax(self, s1: TAInput, timeperiod=30) -> MinMaxResult:
         min_, max_ = xts.MINMAX(s1, timeperiod)
         return MinMaxResult(min_, max_)
 
     @auto_numpy
-    def minmaxindex(self, s1: TAInput = None, timeperiod=30) -> TAOutput:
+    def minmaxindex(self, s1: TAInput, timeperiod=30) -> TAOutput:
         return xts.MINMAXINDEX(s1, timeperiod)
 
     @auto_numpy
-    def mult(self, s1: TAInput = None, s2: TAInput = None) -> TAOutput:
+    def mult(self, s1: TAInput, s2: TAInput) -> TAOutput:
         return xts.MULT(s1, s2)
 
     @auto_numpy
-    def sub(self, s1: TAInput = None, s2: TAInput = None) -> TAOutput:
+    def sub(self, s1: TAInput, s2: TAInput) -> TAOutput:
         return xts.SUB(s1, s2)
 
     @auto_numpy
@@ -659,7 +673,14 @@ class TimeseriesFeature:
         return xts.SUM(s1, timeperiod)
 
     @auto_numpy
-    def rolling_mean(self, s1: TAInput = None, window=20) -> TAOutput:
+    def rolling_window(self, s1: TAInput, window=20) -> TAOutput:
+        """
+        Apply a rolling window function over a specified window.
+        """
+        return xts.ROLLING_WINDOW(s1, window)
+
+    @auto_numpy
+    def rolling_mean(self, s1: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_MEAN(s1, window)
 
     @auto_numpy
@@ -671,29 +692,29 @@ class TimeseriesFeature:
         return xts.ROLLING_MIN(s1, window)
 
     @auto_numpy
-    def rolling_std(self, s1: TAInput = None, window=20) -> TAOutput:
+    def rolling_std(self, s1: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_STD(s1, window)
 
     @auto_numpy
-    def rolling_sum(self, s1: TAInput = None, window=20) -> TAOutput:
+    def rolling_sum(self, s1: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_SUM(s1, window)
 
     @auto_numpy
-    def rolling_prod(self, s1: TAInput = None, window=20) -> TAOutput:
+    def rolling_prod(self, s1: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_PROD(s1, window)
 
     @auto_numpy
-    def rolling_rank(self, s1: TAInput = None, window=20) -> TAOutput:
+    def rolling_rank(self, s1: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_RANK(s1, window)
 
     @auto_numpy
-    def rolling_correlation(self, s1: TAInput = None, s2: TAInput = None, window=20) -> TAOutput:
+    def rolling_correlation(self, s1: TAInput, s2: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_CORRELATION(s1, s2, window)
 
     @auto_numpy
-    def rolling_covariance(self, s1: TAInput = None, s2: TAInput = None, window=20) -> TAOutput:
+    def rolling_covariance(self, s1: TAInput, s2: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_COVARIANCE(s1, s2, window)
 
     @auto_numpy
-    def rolling_median(self, s1: TAInput = None, window=20) -> TAOutput:
+    def rolling_median(self, s1: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_MEDIAN(s1, window)
