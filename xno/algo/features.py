@@ -10,7 +10,7 @@ from inspect import signature, isfunction
 
 
 TAInput = Union[np.ndarray, pd.Series, None]
-TAOutput = Union[np.ndarray, None]
+TAOutput = np.ndarray
 
 ARoonResult = namedtuple("ARoonResult", ["aroondown", "aroonup"])
 MAMAResult = namedtuple("MAMAResult", ["mama", "fama"])

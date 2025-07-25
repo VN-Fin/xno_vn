@@ -7,7 +7,7 @@ import numpy as np
 from xno import OHLCHandler
 from xno.algo.features import TimeseriesFeature
 from xno.analytics.vs import StrategyVisualizer
-from xno.timeseries import CROSS, ABOVE, BELOW, LAG
+from xno.timeseries import CROSS, CROSS_ABOVE, CROSS_BELOW, LAG
 
 
 class HistoryRecord(TypedDict):
@@ -163,7 +163,7 @@ class Algorithm:
         self.__done__()
 
     @classmethod
-    def crossover(cls, series1: Union[pd.Series, np.ndarray], series2: Union[pd.Series, np.ndarray]) -> bool:
+    def crossed(cls, series1: Union[pd.Series, np.ndarray], series2: Union[pd.Series, np.ndarray]) -> bool:
         """
         Check if series1 crosses over series2.
 
@@ -174,7 +174,7 @@ class Algorithm:
         return CROSS(series1, series2)
 
     @classmethod
-    def above(cls, series1: Union[pd.Series, np.ndarray, float], series2: Union[pd.Series, np.ndarray, float]) -> bool:
+    def crossed_above(cls, series1: Union[pd.Series, np.ndarray, float], series2: Union[pd.Series, np.ndarray, float]) -> bool:
         """
         Check if series1 is above series2.
 
@@ -182,10 +182,10 @@ class Algorithm:
         :param series2: The second series to check.
         :return: True if series1 is above series2, False otherwise.
         """
-        return ABOVE(series1, series2)
+        return CROSS_ABOVE(series1, series2)
 
     @classmethod
-    def below(cls, series1: Union[pd.Series, np.ndarray, float], series2: Union[pd.Series, np.ndarray, float]) -> bool:
+    def crossed_below(cls, series1: Union[pd.Series, np.ndarray, float], series2: Union[pd.Series, np.ndarray, float]) -> bool:
         """
         Check if series1 is below series2.
 
@@ -193,7 +193,7 @@ class Algorithm:
         :param series2: The second series to check.
         :return: True if series1 is below series2, False otherwise.
         """
-        return BELOW(series1, series2)
+        return CROSS_BELOW(series1, series2)
 
     @classmethod
     def current(cls, series):

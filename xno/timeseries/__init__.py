@@ -45,16 +45,17 @@ def LAG(x, periods: int = 1):
 
 def CROSS(a, b):
     """
-    Detect crossover (AFL: Cross).
+    Detect crossover.
     Args:
         a (array-like): First input array.
         b (array-like): Second input array.
     """
     a = np.asarray(a)
     b = np.asarray(b)
-    return (a > b) & (LAG(a, 1) <= LAG(b, 1))
+    # Return if above or below
+    return (a > b) & (LAG(a, 1) <= LAG(b, 1)) | (a < b) & (LAG(a, 1) >= LAG(b, 1))
 
-def ABOVE(a, b):
+def CROSS_ABOVE(a, b):
     """
     Check if array 'a' is above array 'b'.
     Args:
@@ -63,9 +64,9 @@ def ABOVE(a, b):
     """
     a = np.asarray(a)
     b = np.asarray(b)
-    return a > b
+    return (a > b) & (LAG(a, 1) <= LAG(b, 1))
 
-def BELOW(a, b):
+def CROSS_BELOW(a, b):
     """
     Check if array 'a' is below array 'b'.
     Args:
@@ -74,7 +75,7 @@ def BELOW(a, b):
     """
     a = np.asarray(a)
     b = np.asarray(b)
-    return a < b
+    return (a < b) & (LAG(a, 1) >= LAG(b, 1))
 
 def EQUAL(a, b):
     """
