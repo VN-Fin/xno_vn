@@ -22,7 +22,7 @@ parts:
   - file: markdown-notebooks
 - caption: Packages
   chapters:
-    - file: packages/technical-indicators-functions
+    - file: packages/funcs
 - caption: Cool extensions 🕶️
   chapters:
   - file: intersphinx
