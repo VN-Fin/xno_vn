@@ -1,0 +1,2 @@
+# The OHLC Data
+The OHLC (Open, High, Low, Close) data is a fundamental component of financial analysis, providing essential information about the price movements of financial instruments over time. This data is crucial for traders and analysts to make informed decisions based on historical price patterns.

@@ -6,8 +6,15 @@ root: intro
 parts:
 - caption: Getting started 🚀
   chapters:
-  - file: installation
-  - file: quick-start
+  - file: started/installation
+  - file: started/quick-start
+- caption: Release notes 📜
+  chapters:
+  - file: releases/notes
+- caption: Data APIs
+  chapters:
+  - file: data-apis/overview
+  - file: data-apis/ohlc
 - caption: Basic examples 🪄
   chapters:
   - file: markdown
