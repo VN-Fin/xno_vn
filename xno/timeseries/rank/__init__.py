@@ -1,11 +1,10 @@
 
 import numpy as np
-from numba.np.arrayobj import sliding_window_view
+# from numba.np.arrayobj import sliding_window_view
+from numpy.lib.stride_tricks import sliding_window_view
 from scipy.stats import rankdata
 
-
 __all__ = [
-    'ROLLING_WINDOW',
     'ROLLING_MEAN',
     'ROLLING_MAX',
     'ROLLING_MIN',
@@ -24,24 +23,11 @@ def rolling_apply(x, window, func, **kwargs):
     if window > n or window < 1:
         return np.full_like(x, np.nan, dtype=float)
 
-    view = np.lib.stride_tricks.sliding_window_view(x, window)
+    view = sliding_window_view(x, window)
     result = np.array([func(win, **kwargs) for win in view], dtype=float)
     padded = np.full(n, np.nan, dtype=float)
     padded[window - 1:] = result
     return padded
-
-
-def ROLLING_WINDOW(x, window):
-    """
-    Create a rolling window view of the input array.
-    Args:
-        x (array-like): Input array.
-        window (int): Size of the rolling window.
-    Returns:
-        numpy.ndarray: Array with rolling windows.
-    """
-    x = np.asarray(x, dtype=float)
-    return sliding_window_view(x, window)
 
 
 def ROLLING_MEAN(x, window):
@@ -95,14 +81,18 @@ def ROLLING_PROD(x, window):
     """
     return rolling_apply(x, window, np.prod)
 
-def ROLLING_RANK(x, window):
+def ROLLING_RANK(x, window, method='average'):
     """
     Apply a rolling rank function over a specified window.
     Args:
         x (array-like): Input array.
         window (int): Size of the rolling window.
+        method (str): Method to use for ranking. Default is 'average', can be 'min', 'max', 'dense', 'ordinal'.
     """
-    return rolling_apply(x, window, rankdata)
+    def rank_data(win):
+        ranks = rankdata(win, method=method)
+        return ranks[-1]
+    return rolling_apply(x, window, rank_data)
 
 def ROLLING_CORRELATION(x, y, window):
     """

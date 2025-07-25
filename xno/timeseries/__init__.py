@@ -10,7 +10,7 @@ from .statistical import *
 from .math import *
 
 from .smc import *
-from .window import *
+from .rank import *
 
 import numpy as np
 

@@ -628,7 +628,7 @@ class TimeseriesFeature:
         return xts.TANH(s1)
 
     @auto_numpy
-    def add(self, s1: TAInput, s2: TAInput) -> Union[np.ndarray, None]:
+    def add(self, s1: TAInput, s2: TAInput) -> TAOutput:
         return xts.ADD(s1, s2)
 
     @auto_numpy
@@ -671,13 +671,6 @@ class TimeseriesFeature:
     @auto_numpy
     def sum(self, s1: TAInput, timeperiod=30) -> TAOutput:
         return xts.SUM(s1, timeperiod)
-
-    @auto_numpy
-    def rolling_window(self, s1: TAInput, window=20) -> TAOutput:
-        """
-        Apply a rolling window function over a specified window.
-        """
-        return xts.ROLLING_WINDOW(s1, window)
 
     @auto_numpy
     def rolling_mean(self, s1: TAInput, window=20) -> TAOutput:
