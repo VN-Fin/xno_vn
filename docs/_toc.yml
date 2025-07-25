@@ -1,0 +1,25 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+parts:
+- caption: Getting started 🚀
+  chapters:
+  - file: installation
+  - file: quick-start
+- caption: Basic examples 🪄
+  chapters:
+  - file: markdown
+  - file: notebooks
+  - file: markdown-notebooks
+- caption: Packages
+  chapters:
+    - file: packages/technical-indicators-functions
+- caption: Cool extensions 🕶️
+  chapters:
+  - file: intersphinx
+  - file: sphinx-examples
+  - file: sphinx-hoverxref
+  - file: sphinx-proof
+
