@@ -38,6 +38,7 @@ sphinx:
   config:
     html_context:
       default_mode: light
+    myst_heading_anchors: 3
     intersphinx_mapping:
       ebp:
         - "https://executablebooks.org/en/latest/"

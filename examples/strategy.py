@@ -1,4 +1,3 @@
-# examples/strategy.py
 from xno.algo.st import StockAlgorithm
 
 

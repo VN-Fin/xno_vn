@@ -17,12 +17,15 @@ parts:
   - file: data-apis/ohlc
 - caption: Basic examples 🪄
   chapters:
-  - file: markdown
-  - file: notebooks
+  - file: examples/stock_strategy_01
   - file: markdown-notebooks
-- caption: Packages
+- caption: Indicators and Functions 📈
   chapters:
-    - file: ta/funcs
+    - file: ta/chart
+    - file: ta/math
+    - file: ta/rolling
+    - file: ta/smc
+    - file: ta/ta
 - caption: Cool extensions 🕶️
   chapters:
   - file: intersphinx

@@ -142,6 +142,11 @@ class StrategyVisualizer:
             template='plotly_white',
             hovermode='closest'
         )
-        from IPython.utils import io
-        with io.capture_output() as captured:
+        # Show the figure
+        import IPython
+        if IPython.get_ipython():
             fig.show()
+        else:
+            from IPython.utils import io
+            with io.capture_output() as captured:
+                fig.show()
