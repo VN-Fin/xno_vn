@@ -8,6 +8,14 @@ import pandas as pd
 import xno.timeseries as xts
 from inspect import signature, isfunction
 
+__all__ = [
+    "TimeseriesFeatures",
+    "TAInput", "TAOutput",
+    "ARoonResult", "MAMAResult", "MACDResult", "MACDEXTResult", "MACDFixResult",
+    "BBANDSResult", "StochResult", "StochFResult", "StochRsiResult",
+    "HtPhasorResult", "HtSineResult", "KDJResult", "MinMaxResult"
+]
+
 
 TAInput = Union[np.ndarray, pd.Series, None]
 TAOutput = np.ndarray
@@ -93,7 +101,7 @@ def auto_numpy(func):
 
 
 
-class TimeseriesFeature:
+class TimeseriesFeatures:
     def __init__(self, df: pd.DataFrame):
         """
         Initialize the feature with the provided data.
@@ -173,7 +181,7 @@ class TimeseriesFeature:
 
     @autofill(columns_map={"series": "Close"})
     def ht_trendline(self, series: TAInput = None) -> TAOutput:
-        return xts.HT_TRENDLINE(series)
+        return xts.TRENDLINE(series)
 
     @autofill(columns_map={"series": "Close"})
     def kama(self, series: TAInput = None, timeperiod=30) -> TAOutput:
@@ -487,26 +495,26 @@ class TimeseriesFeature:
         return xts.TRANGE(high, low, close)
 
     @autofill(columns_map={"close": "Close"})
-    def ht_dcperiod(self, close: TAInput = None) -> TAOutput:
-        return xts.HT_DCPERIOD(close)
+    def dcperiod(self, close: TAInput = None) -> TAOutput:
+        return xts.DCPERIOD(close)
 
     @autofill(columns_map={"close": "Close"})
-    def ht_dcphase(self, close: TAInput = None) -> TAOutput:
-        return xts.HT_DCPHASE(close)
+    def dcphase(self, close: TAInput = None) -> TAOutput:
+        return xts.DCPHASE(close)
 
     @autofill(columns_map={"close": "Close"})
-    def ht_phasor(self, close: TAInput = None) -> HtPhasorResult:
-        inphase, quadrature = xts.HT_PHASOR(close)
+    def phasor(self, close: TAInput = None) -> HtPhasorResult:
+        inphase, quadrature = xts.PHASOR(close)
         return HtPhasorResult(inphase, quadrature)
 
     @autofill(columns_map={"close": "Close"})
-    def ht_sine(self, close: TAInput) -> HtSineResult:
-        sine, leadsine = xts.HT_SINE(close)
+    def sine(self, close: TAInput) -> HtSineResult:
+        sine, leadsine = xts.SINE(close)
         return HtSineResult(sine, leadsine)
 
     @autofill(columns_map={"close": "Close"})
-    def ht_trendmode(self, close: TAInput = None) -> TAOutput:
-        return xts.HT_TRENDMODE(close)
+    def trendmode(self, close: TAInput = None) -> TAOutput:
+        return xts.TRENDMODE(close)
 
     @autofill(columns_map={"open_": "Open", "high": "High", "low": "Low", "close": "Close"})
     def avgprice(

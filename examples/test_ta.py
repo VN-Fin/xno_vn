@@ -3,7 +3,7 @@
 # pip install --extra-index-url https://fiinquant.github.io/fiinquantx/simple fiinquantx
 import numpy as np
 import pandas
-from xno.algo.features import TimeseriesFeature
+from xno.algo.features import TimeseriesFeatures
 
 open_ = np.random.rand(10000)
 high = np.random.rand(10000)
@@ -20,7 +20,7 @@ df = pandas.DataFrame({
     'Volume': volume
 })
 
-ts = TimeseriesFeature(df)
+ts = TimeseriesFeatures(df)
 
 ts.rsi(timeperiod=14)
 ts.rsi(df['Close'], timeperiod=14)

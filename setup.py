@@ -1,8 +1,5 @@
 from setuptools import setup, find_packages
 
-def read_requirements():
-    with open("requirements.txt") as f:
-        return f.read().splitlines()
 
 setup(
     name="xno_vn",  # Change to your package name
@@ -14,7 +11,6 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/VN-Fin/xno_vn",  # GitHub or project link
     packages=find_packages(),
-    install_requires=read_requirements(),  # Load dependencies from requirements.txt
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

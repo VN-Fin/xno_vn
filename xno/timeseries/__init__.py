@@ -3,7 +3,7 @@ from .technicals.overlap import *
 from .technicals.volume import *
 from .technicals.momentum import *
 from .technicals.volatility import *
-from .technicals.cycle import *
+from .technicals.htf import *
 from .pattern.candles import *
 from .pattern.charts import *
 from .statistical import *

@@ -3,6 +3,7 @@ import numpy as np
 # from numba.np.arrayobj import sliding_window_view
 from numpy.lib.stride_tricks import sliding_window_view
 from scipy.stats import rankdata
+import pandas as pd
 
 __all__ = [
     'ROLLING_MEAN',
@@ -30,11 +31,35 @@ def rolling_apply(x, window, func, **kwargs):
     return padded
 
 
+def rolling(func):
+    def decorator(stat_func):
+        def wrapper(data, window, as_source=False):
+            series = data.values if isinstance(data, pd.Series) else np.asarray(data, dtype=float)
+
+            if window > series.size or window < 1:
+                result = np.full(series.shape, np.nan, dtype=float)
+            else:
+                # Vectorized rolling window apply
+                view = sliding_window_view(series, window)
+                result = func(view, axis=1)
+
+            # Pad the result
+            padded = np.full(series.shape, np.nan, dtype=float)
+            padded[window - 1:] = result
+
+            if as_source and isinstance(data, pd.Series):
+                return pd.Series(padded, index=data.index)
+            return padded
+        return wrapper
+    return decorator
+
+
+@rolling(np.mean)
 def ROLLING_MEAN(x, window):
     """
     Apply a rolling mean function over a specified window.
     """
-    return rolling_apply(x, window, np.mean)
+    pass
 
 def ROLLING_MAX(x, window):
     """

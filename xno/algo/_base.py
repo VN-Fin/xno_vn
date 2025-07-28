@@ -5,7 +5,7 @@ from typing import Union, TypedDict, List, Dict
 import pandas as pd
 import numpy as np
 from xno import OHLCHandler
-from xno.algo.features import TimeseriesFeature
+from xno.algo.features import TimeseriesFeatures
 from xno.analytics.vs import StrategyVisualizer
 from xno.timeseries import CROSS, CROSS_ABOVE, CROSS_BELOW, LAG
 
@@ -43,7 +43,7 @@ class Algorithm:
         self._from_time = None
         self._to_time = None
         self._df_ticker = pd.DataFrame()
-        self._features: Union[None, TimeseriesFeature] = None
+        self._features: Union[None, TimeseriesFeatures] = None
         self._init_price: float | None = None
         # The benchmark is used to compare the performance of the algorithm
         self._bm_open_size: int | None = None  # Number of shares for the benchmark, can be set in subclasses
@@ -149,7 +149,7 @@ class Algorithm:
         self.__setup__()
         self.__load_data__()
         self.__reset__()
-        self._features = TimeseriesFeature(self.df_ticker)  # Initialize features with the full DataFrame
+        self._features = TimeseriesFeatures(self.df_ticker)  # Initialize features with the full DataFrame
         # Run the core trading algorithm (fills self._signals)
         self.__algorithm__()
         if not hasattr(self, "_signals") or self._signals is None:

@@ -63,21 +63,6 @@ def EMA(real, timeperiod=30):
     pass
 
 @_call_func
-def HT_TRENDLINE(real):
-    """
-    Hilbert Transform - Instantaneous Trendline.
-
-    Calculates the instantaneous trendline based on the Hilbert Transform.
-
-    :param real: array-like
-        Array of closing prices.
-
-    :return: numpy.ndarray
-        Instantaneous trendline values.
-    """
-    pass
-
-@_call_func
 def KAMA(real, timeperiod=30):
     """
     Kaufman's Adaptive Moving Average (KAMA).

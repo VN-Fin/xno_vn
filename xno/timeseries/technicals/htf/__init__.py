@@ -1,8 +1,7 @@
-from xno.timeseries._internal import _call_func
 
 
-@_call_func
-def HT_DCPERIOD(real):
+
+def DCPERIOD(real):
     """
     Hilbert Transform - Dominant Cycle Period.
 
@@ -14,10 +13,10 @@ def HT_DCPERIOD(real):
     :return: numpy.ndarray
         Dominant cycle period values.
     """
-    pass
+    import talib as tf
+    return tf.HT_DCPERIOD(real)
 
-@_call_func
-def HT_DCPHASE(real):
+def DCPHASE(real):
     """
     Hilbert Transform - Dominant Cycle Phase.
 
@@ -29,9 +28,10 @@ def HT_DCPHASE(real):
     :return: numpy.ndarray
         Dominant cycle phase values.
     """
+    import talib as tf
+    return DCPHASE(real)
 
-@_call_func
-def HT_PHASOR(real):
+def PHASOR(real):
     """
     Hilbert Transform - Phasor Components.
 
@@ -45,10 +45,10 @@ def HT_PHASOR(real):
         - inphase: In-phase component values.
         - quadrature: Quadrature component values.
     """
-    pass
+    import talib as tf
+    return PHASOR(real)
 
-@_call_func
-def HT_SINE(real):
+def SINE(real):
     """
     Hilbert Transform - Sine Wave.
 
@@ -62,10 +62,25 @@ def HT_SINE(real):
         - sine: Sine component values.
         - leadsine: Lead sine component values.
     """
-    pass
+    import talib as tf
+    return tf.HT_SINE(real)
 
-@_call_func
-def HT_TRENDMODE(real):
+def TRENDLINE(real):
+    """
+    Hilbert Transform - Trendline.
+
+    Calculates the trendline using the Hilbert Transform.
+
+    :param real: array-like
+        Array of input data (e.g., closing prices).
+
+    :return: numpy.ndarray
+        Trendline values.
+    """
+    import talib as tf
+    return tf.HT_TRENDLINE(real)
+
+def TRENDMODE(real):
     """
     Hilbert Transform - Trend vs Cycle Mode.
 
@@ -77,4 +92,6 @@ def HT_TRENDMODE(real):
     :return: numpy.ndarray
         Trend vs Cycle mode values.
     """
-    pass
+    import talib as tf
+    return tf.HT_TRENDMODE(real)
+
