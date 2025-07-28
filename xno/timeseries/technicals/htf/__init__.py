@@ -1,4 +1,4 @@
-
+import talib as tf
 
 
 def DCPERIOD(real):
@@ -13,7 +13,6 @@ def DCPERIOD(real):
     :return: numpy.ndarray
         Dominant cycle period values.
     """
-    import talib as tf
     return tf.HT_DCPERIOD(real)
 
 def DCPHASE(real):
@@ -28,7 +27,6 @@ def DCPHASE(real):
     :return: numpy.ndarray
         Dominant cycle phase values.
     """
-    import talib as tf
     return DCPHASE(real)
 
 def PHASOR(real):
@@ -45,7 +43,6 @@ def PHASOR(real):
         - inphase: In-phase component values.
         - quadrature: Quadrature component values.
     """
-    import talib as tf
     return PHASOR(real)
 
 def SINE(real):
@@ -62,7 +59,6 @@ def SINE(real):
         - sine: Sine component values.
         - leadsine: Lead sine component values.
     """
-    import talib as tf
     return tf.HT_SINE(real)
 
 def TRENDLINE(real):
@@ -77,7 +73,6 @@ def TRENDLINE(real):
     :return: numpy.ndarray
         Trendline values.
     """
-    import talib as tf
     return tf.HT_TRENDLINE(real)
 
 def TRENDMODE(real):
@@ -92,6 +87,5 @@ def TRENDMODE(real):
     :return: numpy.ndarray
         Trend vs Cycle mode values.
     """
-    import talib as tf
     return tf.HT_TRENDMODE(real)
 
