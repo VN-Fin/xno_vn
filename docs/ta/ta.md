@@ -2,7 +2,7 @@
 ### AD - A/D Line 
 Calculates the Chaikin Accumulation/Distribution Line.
 
-```
+```python
 xno.TimeseriesFeatures.ad(high=None, low=None, close=None, volume=None)
 ```
 or 
