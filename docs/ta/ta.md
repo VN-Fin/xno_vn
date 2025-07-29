@@ -9,14 +9,14 @@ or
 ```python
 xno.AD(high, low, close, volume)
 ```
-- Example:
+- Example TimeseriesFeatures usage:
 ```python
 from xno import TimeseriesFeatures
 
 f = TimeseriesFeatures(df)
 f.ad()
 ```
-- Example:
+- Example XNO's TA usage:
 ```python
 from xno import AD
 
