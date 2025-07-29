@@ -119,8 +119,8 @@ class TimeseriesFeatures:
         return xts.ADX(high, low, close, timeperiod)
 
     @autofill(columns_map={"close": "Close"})
-    def sma(self, Close: TAInput = None, timeperiod=30) -> TAOutput:
-        return xts.SMA(Close, timeperiod)
+    def sma(self, close: TAInput = None, timeperiod=30) -> TAOutput:
+        return xts.SMA(close, timeperiod)
 
     @autofill(columns_map={"close": "Close"})
     def macd(self, close: TAInput = None, fastperiod=12, slowperiod=26, signalperiod=9) -> MACDResult:
@@ -719,3 +719,244 @@ class TimeseriesFeatures:
     @auto_numpy
     def rolling_median(self, s1: TAInput, window=20) -> TAOutput:
         return xts.ROLLING_MEDIAN(s1, window)
+
+    # CANDLESTICK PATTERNS (I just added it here)
+    @autofill
+    def two_crows(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.TWO_CROWS(open_, high, low, close)
+
+    @autofill
+    def three_black_crows(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.THREE_BLACK_CROWS(open_, high, low, close)
+
+    @autofill
+    def three_inside_up_down(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.THREE_INSIDE(open_, high, low, close)
+
+    @autofill
+    def three_line_strike(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.THREE_LINE_STRIKE(open_, high, low, close)
+
+    @autofill
+    def three_outside_up_down(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.THREE_OUTSIDE(open_, high, low, close)
+
+    @autofill
+    def three_stars_in_south(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.THREE_STARS_IN_THE_SOUTH(open_, high, low, close)
+
+    @autofill
+    def three_white_soldiers(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.THREE_WHITE_SOLDIERS(open_, high, low, close)
+
+    @autofill
+    def abandoned_baby(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.ABANDONED_BABY(open_, high, low, close)
+
+    @autofill
+    def advance_block(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.ADVANCE_BLOCK(open_, high, low, close)
+
+    @autofill
+    def belt_hold(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.BELT_HOLD(open_, high, low, close)
+
+    @autofill
+    def breakaway(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.BREAKAWAY(open_, high, low, close)
+
+    @autofill
+    def closing_marubozu(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.CLOSING_MARUBOZU(open_, high, low, close)
+
+    @autofill
+    def concealing_baby_swallow(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.CONCEAL_BABY_SWALLOW(open_, high, low, close)
+
+    @autofill
+    def counterattack(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.COUNTERATTACK(open_, high, low, close)
+
+    @autofill
+    def dark_cloud_cover(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.DARK_CLOUD_COVER(open_, high, low, close)
+
+    @autofill
+    def doji(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.DOJI(open_, high, low, close)
+
+    @autofill
+    def doji_star(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.DOJI_STAR(open_, high, low, close)
+
+    @autofill
+    def dragonfly_doji(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.DRAGONFLY_DOJI(open_, high, low, close)
+
+    @autofill
+    def engulfing_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.ENGULFING(open_, high, low, close)
+
+    @autofill
+    def evening_doji_star(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.EVENING_DOJI_STAR(open_, high, low, close)
+
+    @autofill
+    def evening_star(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.EVENING_STAR(open_, high, low, close)
+
+    @autofill
+    def gap_sidesidewhite(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.GAP_SIDE_BY_SIDE_WHITE(open_, high, low, close)
+
+    @autofill
+    def gravestone_doji(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.GRAVESTONE_DOJI(open_, high, low, close)
+
+    @autofill
+    def hammer(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HAMMER(open_, high, low, close)
+
+    @autofill
+    def hanging_man(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HANGING_MAN(open_, high, low, close)
+
+    @autofill
+    def harami_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HARAMI(open_, high, low, close)
+
+    @autofill
+    def harami_cross_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HARAMI_CROSS(open_, high, low, close)
+
+    @autofill
+    def high_wave_candle(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HIGH_WAVE(open_, high, low, close)
+
+    @autofill
+    def hikkake_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HIKKAKE(open_, high, low, close)
+
+    @autofill
+    def modified_hikkake_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HIKKAKE_MOD(open_, high, low, close)
+
+    @autofill
+    def homing_pigeon(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.HOMING_PIGEON(open_, high, low, close)
+
+    @autofill
+    def identical_three_crows(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.IDENTICAL_3_CROWS(open_, high, low, close)
+
+    @autofill
+    def in_neck_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.INNECK(open_, high, low, close)
+
+    @autofill
+    def inverted_hammer(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.INVERTED_HAMMER(open_, high, low, close)
+
+    @autofill
+    def kicking(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.KICKING(open_, high, low, close)
+
+    @autofill
+    def kicking_by_length(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.KICKING_BY_LENGTH(open_, high, low, close)
+
+    @autofill
+    def ladder_bottom(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.LADDER_BOTTOM(open_, high, low, close)
+
+    @autofill
+    def long_legged_doji(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.LONG_LEGGED_DOJI(open_, high, low, close)
+
+    @autofill
+    def long_line_candle(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.LONG_LINE_CANDLE(open_, high, low, close)
+
+    @autofill
+    def marubozu(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.MARUBOZU(open_, high, low, close)
+
+    @autofill
+    def matching_low(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.MATCHING_LOW(open_, high, low, close)
+
+    @autofill
+    def mat_hold(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.MAT_HOLD(open_, high, low, close)
+
+    @autofill
+    def morning_doji_star(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.MORNING_DOJI_STAR(open_, high, low, close)
+
+    @autofill
+    def morning_star(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.MORNING_STAR(open_, high, low, close)
+
+    @autofill
+    def on_neck_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.ON_NECK(open_, high, low, close)
+
+    @autofill
+    def piercing_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.PIERCING(open_, high, low, close)
+
+    @autofill
+    def rickshaw_man(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.RICKSHAW_MAN(open_, high, low, close)
+
+    @autofill
+    def rising_falling_three_methods(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.RISING_FALLING_THREE_METHODS(open_, high, low, close)
+
+    @autofill
+    def separating_lines(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.SEPARATING_LINES(open_, high, low, close)
+
+    @autofill
+    def shooting_star(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.SHOOTING_STAR(open_, high, low, close)
+
+    @autofill
+    def short_line_candle(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.SHORT_LINE_CANDLE(open_, high, low, close)
+
+    @autofill
+    def spinning_top(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.SPINNING_TOP(open_, high, low, close)
+
+    @autofill
+    def stalled_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.STALLEDPATTERN(open_, high, low, close)
+
+    @autofill
+    def stick_sandwich(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.STICK_SANDWICH(open_, high, low, close)
+
+    @autofill
+    def takuri(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.TAKURI(open_, high, low, close)
+
+    @autofill
+    def thrusting_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.THRUSTING(open_, high, low, close)
+
+    @autofill
+    def tristar_pattern(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.TRISTAR(open_, high, low, close)
+
+    @autofill
+    def unique_3_river(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.UNIQUE_3_RIVER(open_, high, low, close)
+
+    @autofill
+    def upside_gap_two_crows(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.UPSIDE_GAP_TWO_CROWS(open_, high, low, close)
+
+    @autofill
+    def xside_gap_3methods(self, open_: TAInput = None, high: TAInput = None, low: TAInput = None, close: TAInput = None) -> TAOutput:
+        return xts.X_SIDE_GAP_3_METHODS(open_, high, low, close)
