@@ -1,6 +1,6 @@
 ## Chart Patterns
-### CDL2CROWS	- Two Crows
-### CDL3BLACKCROWS	- Three Black Crows
+### TWO_CROWS	- Two Crows
+### THREE_BLACK_CROWS	- Three Black Crows
 ### CDL3INSIDE	- Three Inside Up/Down
 ### CDL3LINESTRIKE	- Three Outside Up/Down
 ### CDL3STARSINSOUTH	- Three Stars In The South
