@@ -45,7 +45,7 @@ import xno.timeseries as xts
 
 result = xts.THREE_BLACK_CROWS(df['Open'], df['High'], df['Low'], df['Close'])
 ```
-### CDL3INSIDE	- Three Inside Up/Down
+### Three Inside Up/Down
 Identifies the Three Inside Up/Down candlestick pattern.
 
 ```python
@@ -68,7 +68,7 @@ from xno import CDL3INSIDE
 
 f = CDL3INSIDE(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDL3LINESTRIKE	- Three Outside Up/Down
+### Three Outside Up/Down
 Identifies the Three Line Strike candlestick pattern.
 
 ```python
@@ -91,7 +91,7 @@ from xno import CDL3LINESTRIKE
 
 f = CDL3LINESTRIKE(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDL3STARSINSOUTH	- Three Stars In The South
+### Three Stars In The South
 Identifies the Three Stars In The South candlestick pattern.
 
 ```python
@@ -114,7 +114,7 @@ from xno import CDL3STARSINSOUTH
 
 f = CDL3STARSINSOUTH(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDL3WHITESOLDIERS	- Three Advancing White Soldiers
+### Three Advancing White Soldiers
 Identifies the Three Advancing White Soldiers candlestick pattern.
 
 ```python
@@ -137,7 +137,7 @@ from xno import CDL3WHITESOLDIERS
 
 f = CDL3WHITESOLDIERS(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLABANDONEDBABY	- Abandoned Baby
+### Abandoned Baby
 Identifies the Abandoned Baby candlestick pattern.
 
 ```python
@@ -160,7 +160,7 @@ from xno import CDLABANDONEDBABY
 
 f = CDLABANDONEDBABY(df['open'], df['high'], df['low'], df['close'], 0.3)
 ```
-### CDLADVANCEBLOCK	- Advance Block
+### Advance Block
 Identifies the Advance Block candlestick pattern.
 
 ```python
@@ -183,7 +183,7 @@ from xno import CDLADVANCEBLOCK
 
 f = CDLADVANCEBLOCK(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLBELTHOLD	- Belt-Hold
+### Belt-Hold
 Identifies the Belt-Hold candlestick pattern.
 
 ```python
@@ -206,7 +206,7 @@ from xno import CDLBELTHOLD
 
 f = CDLBELTHOLD(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLBREAKAWAY	- Breakaway
+### Breakaway
 Identifies the Breakaway candlestick pattern.
 
 ```python
@@ -229,7 +229,7 @@ from xno import CDLBREAKAWAY
 
 f = CDLBREAKAWAY(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLCLOSINGMARUBOZU	- Closing Marubozu
+### Closing Marubozu
 Identifies the Closing Marubozu candlestick pattern.
 
 ```python
@@ -252,7 +252,7 @@ from xno import CDLCLOSINGMARUBOZU
 
 f = CDLCLOSINGMARUBOZU(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLCONCEALBABYSWALL	- Concealing Baby Swallow
+### Concealing Baby Swallow
 Identifies the Concealing Baby Swallow candlestick pattern.
 
 ```python
@@ -275,7 +275,7 @@ from xno import CDLCONCEALBABYSWALL
 
 f = CDLCONCEALBABYSWALL(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLCOUNTERATTACK	- Counterattack
+### Counterattack
 Identifies the Counterattack candlestick pattern.
 
 ```python
@@ -298,7 +298,7 @@ from xno import CDLCOUNTERATTACK
 
 f = CDLCOUNTERATTACK(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLDARKCLOUDCOVER	- Dark Cloud Cover
+### Dark Cloud Cover
 Identifies the Dark Cloud Cover candlestick pattern.
 
 ```python
@@ -321,7 +321,7 @@ from xno import CDLDARKCLOUDCOVER
 
 f = CDLDARKCLOUDCOVER(df['open'], df['high'], df['low'], df['close'], 0.5)
 ```
-### CDLDOJI	Doji
+### Doji
 Identifies the Doji candlestick pattern.
 
 ```python
@@ -344,7 +344,7 @@ from xno import CDLDOJI
 
 f = CDLDOJI(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLDOJISTAR	- Doji Star
+### Doji Star
 Identifies the Doji Star candlestick pattern.
 
 ```python
@@ -367,7 +367,7 @@ from xno import CDLDOJISTAR
 
 f = CDLDOJISTAR(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLDRAGONFLYDOJI	- Dragonfly Doji
+### Dragonfly Doji
 Identifies the Dragonfly Doji candlestick pattern.
 
 ```python
@@ -390,7 +390,7 @@ from xno import CDLDRAGONFLYDOJI
 
 f = CDLDRAGONFLYDOJI(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLENGULFING	- Engulfing Pattern
+### Engulfing Pattern
 Identifies the Engulfing Pattern candlestick pattern.
 
 ```python
@@ -413,7 +413,7 @@ from xno import CDLENGULFING
 
 f = CDLENGULFING(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLEVENINGDOJISTAR	- Evening Doji Star
+### Evening Doji Star
 Identifies the Evening Doji Star candlestick pattern.
 
 ```python
@@ -436,7 +436,7 @@ from xno import CDLEVENINGDOJISTAR
 
 f = CDLEVENINGDOJISTAR(df['open'], df['high'], df['low'], df['close'], 0.3)
 ```
-### CDLEVENINGSTAR	- Evening Star
+### Evening Star
 Identifies the Evening Star candlestick pattern.
 
 ```python
@@ -459,7 +459,7 @@ from xno import CDLEVENINGSTAR
 
 f = CDLEVENINGSTAR(df['open'], df['high'], df['low'], df['close'], 0.3)
 ```
-### CDLGAPSIDESIDEWHITE	- Up/Down-gap side-by-side white lines
+### Up/Down-gap side-by-side white lines
 Identifies the Up/Down-gap side-by-side white lines candlestick pattern.
 
 ```python
@@ -482,7 +482,7 @@ from xno import CDLGAPSIDESIDEWHITE
 
 f = CDLGAPSIDESIDEWHITE(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLGRAVESTONEDOJI	- Gravestone Doji
+### Gravestone Doji
 Identifies the Gravestone Doji candlestick pattern.
 
 ```python
@@ -505,7 +505,7 @@ from xno import CDLGRAVESTONEDOJI
 
 f = CDLGRAVESTONEDOJI(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHAMMER	- Hammer
+### Hammer
 Identifies the Hammer candlestick pattern.
 
 ```python
@@ -528,7 +528,7 @@ from xno import CDLHAMMER
 
 f = CDLHAMMER(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHANGINGMAN	- Hanging Man
+### Hanging Man
 Identifies the Hanging Man candlestick pattern.
 
 ```python
@@ -551,7 +551,7 @@ from xno import CDLHANGINGMAN
 
 f = CDLHANGINGMAN(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHARAMI	- Harami Pattern
+### Harami Pattern
 Identifies the Harami Pattern candlestick pattern.
 
 ```python
@@ -574,7 +574,7 @@ from xno import CDLHARAMI
 
 f = CDLHARAMI(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHARAMICROSS	- Harami Cross Pattern
+### Harami Cross Pattern
 Identifies the Harami Cross Pattern candlestick pattern.
 
 ```python
@@ -597,7 +597,7 @@ from xno import CDLHARAMICROSS
 
 f = CDLHARAMICROSS(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHIGHWAVE	- High-Wave Candle
+### High-Wave Candle
 Identifies the High-Wave Candle candlestick pattern.
 
 ```python
@@ -620,7 +620,7 @@ from xno import CDLHIGHWAVE
 
 f = CDLHIGHWAVE(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHIKKAKE	- Hikkake Pattern
+### Hikkake Pattern
 Identifies the Hikkake Pattern candlestick pattern.
 
 ```python
@@ -643,7 +643,7 @@ from xno import CDLHIKKAKE
 
 f = CDLHIKKAKE(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHIKKAKEMOD	- Modified Hikkake Pattern
+### Modified Hikkake Pattern
 Identifies the Modified Hikkake Pattern candlestick pattern.
 
 ```python
@@ -666,7 +666,7 @@ from xno import CDLHIKKAKEMOD
 
 f = CDLHIKKAKEMOD(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLHOMINGPIGEON	- Homing Pigeon
+### Homing Pigeon
 Identifies the Homing Pigeon candlestick pattern.
 
 ```python
@@ -689,7 +689,7 @@ from xno import CDLHOMINGPIGEON
 
 f = CDLHOMINGPIGEON(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLIDENTICAL3CROWS	- Identical Three Crows
+### Identical Three Crows
 Identifies the Identical Three Crows candlestick pattern.
 
 ```python
@@ -712,7 +712,7 @@ from xno import CDLIDENTICAL3CROWS
 
 f = CDLIDENTICAL3CROWS(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLINNECK	- In-Neck Pattern
+### In-Neck Pattern
 Identifies the In-Neck Pattern candlestick pattern.
 
 ```python
@@ -735,7 +735,7 @@ from xno import CDLINNECK
 
 f = CDLINNECK(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLINVERTEDHAMMER	- Inverted Hammer
+### Inverted Hammer
 Identifies the Inverted Hammer candlestick pattern.
 
 ```python
@@ -758,7 +758,7 @@ from xno import CDLINVERTEDHAMMER
 
 f = CDLINVERTEDHAMMER(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLKICKING	- Kicking
+### Kicking
 Identifies the Kicking candlestick pattern.
 
 ```python
@@ -781,7 +781,7 @@ from xno import CDLKICKING
 
 f = CDLKICKING(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLKICKINGBYLENGTH	- Kicking - bull/bear determined by the longer marubozu
+### Kicking - bull/bear determined by the longer marubozu
 Identifies the Kicking by Length candlestick pattern.
 
 ```python
@@ -804,7 +804,7 @@ from xno import CDLKICKINGBYLENGTH
 
 f = CDLKICKINGBYLENGTH(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLLADDERBOTTOM	- Ladder Bottom
+### Ladder Bottom
 Identifies the Ladder Bottom candlestick pattern.
 
 ```python
@@ -827,7 +827,7 @@ from xno import CDLLADDERBOTTOM
 
 f = CDLLADDERBOTTOM(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLLONGLEGGEDDOJI	- Long Legged Doji
+### Long Legged Doji
 Identifies the Long Legged Doji candlestick pattern.
 
 ```python
@@ -850,7 +850,7 @@ from xno import CDLLONGLEGGEDDOJI
 
 f = CDLLONGLEGGEDDOJI(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLLONGLINE - 	Long Line Candle
+### Long Line Candle
 Identifies the Long Line Candle candlestick pattern.
 
 ```python
@@ -873,7 +873,7 @@ from xno import CDLLONGLINE
 
 f = CDLLONGLINE(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLMARUBOZU	- Marubozu
+### Marubozu
 Identifies the Marubozu candlestick pattern.
 
 ```python
@@ -896,7 +896,7 @@ from xno import CDLMARUBOZU
 
 f = CDLMARUBOZU(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLMATCHINGLOW	- Matching Low
+### Matching Low
 Identifies the Matching Low candlestick pattern.
 
 ```python
@@ -919,7 +919,7 @@ from xno import CDLMATCHINGLOW
 
 f = CDLMATCHINGLOW(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLMATHOLD	- Mat Hold
+### Mat Hold
 Identifies the Mat Hold candlestick pattern.
 
 ```python
@@ -942,7 +942,7 @@ from xno import CDLMATHOLD
 
 f = CDLMATHOLD(df['open'], df['high'], df['low'], df['close'], 0.5)
 ```
-### CDLMORNINGDOJISTAR	- Morning Doji Star
+### Morning Doji Star
 Identifies the Morning Doji Star candlestick pattern.
 
 ```python
@@ -965,7 +965,7 @@ from xno import CDLMORNINGDOJISTAR
 
 f = CDLMORNINGDOJISTAR(df['open'], df['high'], df['low'], df['close'], 0.3)
 ```
-### CDLMORNINGSTAR	- Morning Star
+### Morning Star
 Identifies the Morning Star candlestick pattern.
 
 ```python
@@ -988,7 +988,7 @@ from xno import CDLMORNINGSTAR
 
 f = CDLMORNINGSTAR(df['open'], df['high'], df['low'], df['close'], 0.3)
 ```
-### CDLONNECK	- On-Neck Pattern
+### On-Neck Pattern
 Identifies the On-Neck Pattern candlestick pattern.
 
 ```python
@@ -1011,7 +1011,7 @@ from xno import CDLONNECK
 
 f = CDLONNECK(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLPIERCING	- Piercing Pattern
+### Piercing Pattern
 Identifies the Piercing Pattern candlestick pattern.
 
 ```python
@@ -1034,7 +1034,7 @@ from xno import CDLPIERCING
 
 f = CDLPIERCING(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLRICKSHAWMAN	- Rickshaw Man
+### Rickshaw Man
 Identifies the Rickshaw Man candlestick pattern.
 
 ```python
@@ -1057,7 +1057,7 @@ from xno import CDLRICKSHAWMAN
 
 f = CDLRICKSHAWMAN(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLRISEFALL3METHODS	- Rising/Falling Three Methods
+### Rising/Falling Three Methods
 Identifies the Rising/Falling Three Methods candlestick pattern.
 
 ```python
@@ -1080,7 +1080,7 @@ from xno import CDLRISEFALL3METHODS
 
 f = CDLRISEFALL3METHODS(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLSEPARATINGLINES	- Separating Lines
+### Separating Lines
 Identifies the Separating Lines candlestick pattern.
 
 ```python
@@ -1103,7 +1103,7 @@ from xno import CDLSEPARATINGLINES
 
 f = CDLSEPARATINGLINES(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLSHOOTINGSTAR	- Shooting Star
+### Shooting Star
 Identifies the Shooting Star candlestick pattern.
 
 ```python
@@ -1126,7 +1126,7 @@ from xno import CDLSHOOTINGSTAR
 
 f = CDLSHOOTINGSTAR(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLSHORTLINE	- Short Line Candle
+### Short Line Candle
 Identifies the Short Line Candle candlestick pattern.
 
 ```python
@@ -1149,7 +1149,7 @@ from xno import CDLSHORTLINE
 
 f = CDLSHORTLINE(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLSPINNINGTOP	- Spinning Top
+### Spinning Top
 Identifies the Spinning Top candlestick pattern.
 
 ```python
@@ -1172,7 +1172,7 @@ from xno import CDLSPINNINGTOP
 
 f = CDLSPINNINGTOP(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLSTALLEDPATTERN	- Stalled Pattern
+### Stalled Pattern
 Identifies the Stalled Pattern candlestick pattern.
 
 ```python
@@ -1195,7 +1195,7 @@ from xno import CDLSTALLEDPATTERN
 
 f = CDLSTALLEDPATTERN(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLSTICKSANDWICH	- Stick Sandwich
+### Stick Sandwich
 Identifies the Stick Sandwich candlestick pattern.
 
 ```python
@@ -1218,7 +1218,7 @@ from xno import CDLSTICKSANDWICH
 
 f = CDLSTICKSANDWICH(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLTAKURI	- Takuri (Dragonfly Doji with very long lower shadow)
+### Takuri (Dragonfly Doji with very long lower shadow)
 Identifies the Takuri candlestick pattern.
 
 ```python
@@ -1241,7 +1241,7 @@ from xno import CDLTAKURI
 
 f = CDLTAKURI(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLTASUKIGAP	- Tasuki Gap
+### Tasuki Gap
 Identifies the Tasuki Gap candlestick pattern.
 
 ```python
@@ -1264,7 +1264,7 @@ from xno import CDLTASUKIGAP
 
 f = CDLTASUKIGAP(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLTHRUSTING	- Thrusting Pattern
+### Thrusting Pattern
 Identifies the Thrusting Pattern candlestick pattern.
 
 ```python
@@ -1287,7 +1287,7 @@ from xno import CDLTHRUSTING
 
 f = CDLTHRUSTING(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLTRISTAR	- Tristar Pattern
+### Tristar Pattern
 Identifies the Tristar Pattern candlestick pattern.
 
 ```python
@@ -1310,7 +1310,7 @@ from xno import CDLTRISTAR
 
 f = CDLTRISTAR(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLUNIQUE3RIVER	- Unique 3 River
+### Unique 3 River
 Identifies the Unique 3 River candlestick pattern.
 
 ```python
@@ -1333,7 +1333,7 @@ from xno import CDLUNIQUE3RIVER
 
 f = CDLUNIQUE3RIVER(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLUPSIDEGAP2CROWS	- Upside Gap Two Crows
+### Upside Gap Two Crows
 Identifies the Upside Gap Two Crows candlestick pattern.
 
 ```python
@@ -1356,7 +1356,7 @@ from xno import CDLUPSIDEGAP2CROWS
 
 f = CDLUPSIDEGAP2CROWS(df['open'], df['high'], df['low'], df['close'])
 ```
-### CDLXSIDEGAP3METHODS	- Upside/Downside Gap Three Methods
+### Upside/Downside Gap Three Methods
 Identifies the Upside/Downside Gap Three Methods candlestick pattern.
 
 ```python
