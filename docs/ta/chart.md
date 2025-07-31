@@ -1,4 +1,4 @@
-## Chart Patterns
+## Candle Patterns
 ### TWO_CROWS	- Two Crows
 Identifies the Two Crows candlestick pattern.
 
