@@ -26,7 +26,6 @@ class HistoryRecord(TypedDict):
     bm_step_ret: float
     bm_cum_ret: float
 
-
 class Algorithm:
     """
     Base class for all trading algorithms.
@@ -35,8 +34,6 @@ class Algorithm:
     def __init__(self):
         self._name = None
         self._init_cash = 1_000_000_000 # Default initial cash, can be overridden in subclasses
-        self._init_fee = 0.001
-        self._fixed_fee = 25_000
         self._slippage = 0.05  # Assumed slippage price impact, can be overridden in subclasses
         self._resolution = None
         self._ticker = None
@@ -113,31 +110,46 @@ class Algorithm:
 
     @property
     def Open(self):
-        return self.df_ticker['Open']
+        return self.df_ticker['Open'].values
 
     @property
     def High(self):
-        return self.df_ticker['High']
+        return self.df_ticker['High'].values
 
     @property
     def Low(self):
-        return self.df_ticker['Low']
+        return self.df_ticker['Low'].values
 
     @property
     def Close(self):
-        return self.df_ticker['Close']
+        return self.df_ticker['Close'].values
 
     @property
     def Volume(self):
-        return self.df_ticker['Volume']
+        return self.df_ticker['Volume'].values
 
     def __load_data__(self):
         assert self._ticker is not None, "Ticker must be set before loading data."
         logging.info(f"Loading data for tickers: {self._ticker} from {self._from_time} to {self._to_time}")
-        data_handler = OHLCHandler([self._ticker], resolution='D')
+        if self._resolution != 'D':
+            load_resolution = "m" if self._resolution.endswith('min') else self._resolution[-1]
+        else:
+            load_resolution = "D"
+
+        data_handler = OHLCHandler([self._ticker], resolution=load_resolution)
         data_handler.load_data(from_time=self._from_time, to_time=self._to_time)
         self.df_ticker = data_handler.get_data(self._ticker)
         self.df_ticker = self.df_ticker.xs(self._ticker, level="Symbol", drop_level=True)
+        # Resample
+        if self._resolution != "D":
+            self.df_ticker = self.df_ticker.resample(self._resolution).agg({
+                'Open': 'first',
+                'High': 'max',
+                'Low': 'min',
+                'Close': 'last',
+                'Volume': 'sum'
+            }).dropna()
+
         if self.df_ticker.empty:
             raise ValueError(f"No data found for ticker {self._ticker} in the specified date range.")
         logging.info(f"Data loaded for ticker {self._ticker} with {len(self.df_ticker)} records.")
@@ -246,6 +258,7 @@ class Algorithm:
         step_ret = np.zeros_like(equity, dtype=np.float64)
         step_ret[1:] = (equity[1:] - equity[:-1]) / equity[:-1]
         cum_ret = np.cumprod(1 + step_ret) - 1
+
         # Benchmark returns
         bm_step_ret = np.zeros_like(bm_equity, dtype=np.float64)
         bm_step_ret[1:] = (bm_equity[1:] - bm_equity[:-1]) / bm_equity[:-1]
@@ -257,6 +270,7 @@ class Algorithm:
         self._bt_df['bm_step_ret'] = bm_step_ret
         self._bt_df['bm_cum_ret'] = bm_cum_ret
         self._bt_df.set_index('time', inplace=True)
+        return self
 
     def visualize(self):
         visualizer = StrategyVisualizer(self._bt_df)
