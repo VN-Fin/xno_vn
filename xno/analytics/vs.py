@@ -73,25 +73,46 @@ class StrategyVisualizer:
 
         # Buy markers
         buy_df = df[df['action'] == 'B'].copy()
-        buy_df['time_str'] = buy_df.index.strftime('%Y-%m-%d %H:%M:%S')
+        buy_df['date_str'] = buy_df.index.strftime('%Y-%m-%d')
+        buy_df['time_str'] = buy_df.index.strftime('%H:%M:%S')
+        # Format to string, 100000000 -> 100,000,000
+        buy_df['balance_str'] = buy_df['equity'].apply(lambda x: f"{x:,.2f}")
+        buy_df['amount_str'] = buy_df['amount'].apply(lambda x: f"{x:.2f}")
+        buy_df['fee_str'] = buy_df['fee'].apply(lambda x: f"{x:.2f}")
+        buy_df['price_str'] = buy_df['price'].apply(lambda x: f"{x:.2f}")
         fig.add_trace(go.Scatter(
             x=buy_df.index, y=buy_df['price'], mode='markers', name='Buy',
             marker=dict(symbol='triangle-up', color='green', size=10),
-            hovertemplate="Buy<br>Time: %{customdata[0]}<br>Price: %{y}<br>Amount: %{customdata[0]}<br>Fee: %{customdata[1]}<extra></extra>",
-            customdata=buy_df[['amount', 'fee', 'time_str']].round(2).values
+            hovertemplate="Buy [%{customdata[0]}]<br>"
+                          "Time: %{customdata[1]}<br>"
+                          "Price: %{customdata[2]}<br>"
+                          "Amount: %{customdata[3]}<br>"
+                          "Fee: %{customdata[4]}<br>"
+                          "Balance: %{customdata[5]}"
+                          "<extra></extra>",
+            customdata=buy_df[['date_str', 'time_str', 'price_str', 'amount_str', 'fee_str', 'balance_str']].values
         ), row=2, col=1)
 
         # Sell markers
         sell_df = df[df['action'] == 'S'].copy()
-        sell_df['time_str'] = sell_df.index.strftime('%Y-%m-%d %H:%M:%S')
-        amount_str = sell_df['amount'].apply(lambda x: f"{x:.2f}")
-        fee_str = sell_df['fee'].apply(lambda x: f"{x:.2f}")
-        price_str = sell_df['price'].apply(lambda x: f"{x:.2f}")
+        sell_df['date_str'] = sell_df.index.strftime('%Y-%m-%d')
+        sell_df['time_str'] = sell_df.index.strftime('%H:%M:%S')
+        # Format to string, 100000000 -> 100,000,000
+        sell_df['balance_str'] = sell_df['equity'].apply(lambda x: f"{x:,.2f}")
+        sell_df['amount_str'] = sell_df['amount'].apply(lambda x: f"{x:.2f}")
+        sell_df['fee_str'] = sell_df['fee'].apply(lambda x: f"{x:.2f}")
+        sell_df['price_str'] = sell_df['price'].apply(lambda x: f"{x:.2f}")
         fig.add_trace(go.Scatter(
             x=sell_df.index, y=sell_df['price'], mode='markers', name='Sell',
             marker=dict(symbol='triangle-down', color='red', size=10),
-            hovertemplate="Sell<br>Time: %{customdata[2]}<br>Price: %{y}<br>Amount: %{customdata[0]}<br>Fee: %{customdata[1]}<extra></extra>",
-            customdata=sell_df[['amount', 'fee', 'time_str']].round(2).values
+            hovertemplate="Sell [%{customdata[0]}]<br>"
+                          "Time: %{customdata[1]}<br>"
+                          "Price: %{customdata[2]}<br>"
+                          "Amount: %{customdata[3]}<br>"
+                          "Fee: %{customdata[4]}<br>"
+                          "Balance: %{customdata[5]}"
+                          "<extra></extra>",
+            customdata=buy_df[['date_str', 'time_str', 'price_str', 'amount_str', 'fee_str', 'balance_str']].values
         ), row=2, col=1)
 
         # Latest annotation
