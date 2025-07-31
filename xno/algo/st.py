@@ -20,6 +20,7 @@ class StockAlgorithm(Algorithm):
     def __init__(self):
         super().__init__()
         # Init the state of stock algorithm
+        self._init_fee = 0.001
         self._t0_size: float = 0.0            # T+0 position size
         self._t1_size: float = 0.0            # T+1 position size
         self._t2_size: float = 0.0            # T+2 position size
@@ -28,11 +29,11 @@ class StockAlgorithm(Algorithm):
 
     @abstractmethod
     def __setup__(self):
-        pass
+        raise NotImplementedError("StockAlgorithm must implement __setup__ method")
 
     @abstractmethod
     def __algorithm__(self):
-        pass
+        raise NotImplementedError("StockAlgorithm must implement __algorithm__ method")
 
     def __reset__(self):
         super().__reset__()

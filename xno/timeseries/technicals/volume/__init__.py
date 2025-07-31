@@ -86,13 +86,13 @@ def VWAP(high, low, close, volume):
     :return: numpy.ndarray
         Volume Weighted Average Price values.
     """
-    if isinstance(pd.Series, high):
+    if isinstance(high, pd.Series):
         high = high.values
-    if isinstance(pd.Series, low):
+    if isinstance(low, pd.Series):
         low = low.values
-    if isinstance(pd.Series, close):
+    if isinstance(close, pd.Series):
         close = close.values
-    if isinstance(pd.Series, volume):
+    if isinstance(volume, pd.Series):
         volume = volume.values
     # Ensure all inputs are numpy arrays
     high = np.asarray(high, dtype=np.float64)
