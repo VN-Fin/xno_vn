@@ -19,6 +19,8 @@ parts:
   chapters:
   - file: examples/_overview
   - file: examples/stock_strategy_01
+  - file: examples/stock_strategy_02
+  - file: examples/stock_strategy_03
   - file: markdown-notebooks
 - caption: Indicators and Functions 📈
   chapters:
