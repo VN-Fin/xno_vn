@@ -26,13 +26,27 @@ else
     exit 1
 fi
 
-# Update package index and install dependencies
+# Update package index and install base dependencies
 $UPDATE_CMD
 
 $INSTALL_CMD git gcc make wget tar ca-certificates \
     libffi-dev || true
 $INSTALL_CMD libatlas-base-dev liblapack-dev libssl-dev build-essential || true
 $INSTALL_CMD base-devel lapack blas || true # for Arch-based systems
+
+# Install Python and pip if missing
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "[*] Installing Python 3..."
+    $INSTALL_CMD python3
+fi
+
+if ! command -v pip3 >/dev/null 2>&1 && ! command -v pip >/dev/null 2>&1; then
+    echo "[*] Installing pip..."
+    $INSTALL_CMD python3-pip || $INSTALL_CMD pip
+fi
+
+# Ensure pip is upgraded
+python3 -m pip install --upgrade pip setuptools wheel
 
 echo "[*] Building and installing TA-Lib C library..."
 
