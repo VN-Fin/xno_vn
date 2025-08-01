@@ -8,7 +8,7 @@ class RsiMeanReversion(DerivativeAlgorithm):
         self._ticker = "VN30F1M"
         self._resolution = "5min"
         self._from_time = "2025-01-01 09:00:00"
-        self._to_time = "2025-07-30 15:00:00"
+        self._to_time = "2025-08-31 15:00:00"
         self._init_cash = 500_000_000
         self._slippage = 0.05
 

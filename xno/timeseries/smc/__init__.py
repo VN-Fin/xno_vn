@@ -1,3 +1,3 @@
-from xno.fvg import FVG
-from xno.swings import SWING_HIGHS_LOWS
-from xno.bos import BOS_CHOCH
+from xno.timeseries.smc.fvg import FVG
+from xno.timeseries.smc.swings import SWING_HIGHS_LOWS
+from xno.timeseries.smc.bos import BOS_CHOCH
