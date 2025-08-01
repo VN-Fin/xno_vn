@@ -17,6 +17,7 @@ parts:
   - file: data-apis/ohlc
 - caption: Basic examples 🪄
   chapters:
+  - file: examples/_overview
   - file: examples/stock_strategy_01
   - file: markdown-notebooks
 - caption: Indicators and Functions 📈
