@@ -9,5 +9,8 @@ version = "0.1.0"
 [tool.setuptools]
 packages = ["xno"]
 
-[tool.setuptools.package-dir]
-"" = "."
+#[tool.setuptools.package-dir]
+#"" = "."
+
+[tool.setuptools.packages.find]
+where = ["."]
