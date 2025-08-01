@@ -34,18 +34,6 @@ $INSTALL_CMD git gcc make wget tar ca-certificates \
 $INSTALL_CMD libatlas-base-dev liblapack-dev libssl-dev build-essential || true
 $INSTALL_CMD base-devel lapack blas || true # for Arch-based systems
 
-# Clone the repo if not already present
-if [ ! -d "xno_vn" ]; then
-    echo "[*] Cloning repository..."
-    git clone https://github.com/VN-Fin/xno_vn.git
-fi
-
-cd xno_vn
-
-# Pull latest changes
-echo "[*] Pulling latest changes..."
-git pull origin main
-
 echo "[*] Building and installing TA-Lib C library..."
 
 cd /tmp
@@ -61,6 +49,18 @@ rm -rf ta-lib-0.6.4*
 echo "[*] Installing Python TA-Lib wrapper..."
 python3 -m pip install --upgrade pip
 python3 -m pip install TA-Lib
+
+# Clone the repo if not already present
+if [ ! -d "xno_vn" ]; then
+    echo "[*] Cloning repository..."
+    git clone https://github.com/VN-Fin/xno_vn.git
+fi
+
+cd xno_vn
+
+# Pull latest changes
+echo "[*] Pulling latest changes..."
+git pull origin main
 
 echo "[*] Installing Python requirements..."
 pip install -r requirements.txt
