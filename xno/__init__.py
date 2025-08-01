@@ -6,15 +6,15 @@ os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
 _log_level = os.environ.get('LOG_LEVEL', 'info').upper()
 
 if TYPE_CHECKING:
-    from .algo import features  # Only imported for type hinting/doc build
-    from . import timeseries
-    from .data.handlers.ohlc import OHLCHandler
-    from .config import settings
+    from xno.algo import features  # Only imported for type hinting/doc build
+    from xno import timeseries
+    from xno.data.handlers.ohlc import OHLCHandler
+    from xno.config import settings
 else:
-    from .algo.features import *
-    from .timeseries import *
-    from .config import settings
-    from .data.handlers.ohlc import OHLCHandler
+    from xno.algo.features import *
+    from xno.timeseries import *
+    from xno.config import settings
+    from xno.data.handlers.ohlc import OHLCHandler
     import pandas as pd
     pd.option_context("display.multi_sparse", False)
 

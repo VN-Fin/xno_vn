@@ -47,7 +47,6 @@ cd ..
 rm -rf ta-lib-0.6.4*
 
 echo "[*] Installing Python TA-Lib wrapper..."
-python3 -m pip install --upgrade pip
 python3 -m pip install TA-Lib
 
 # Clone the repo if not already present

@@ -1,16 +1,16 @@
-from .price import *
-from .technicals.overlap import *
-from .technicals.volume import *
-from .technicals.momentum import *
-from .technicals.volatility import *
-from .technicals.htf import *
-from .pattern.candles import *
-from .pattern.charts import *
-from .statistical import *
-from .math import *
+from xno.timeseries.price import *
+from xno.timeseries.technicals.overlap import *
+from xno.timeseries.technicals.volume import *
+from xno.timeseries.technicals.momentum import *
+from xno.timeseries.technicals.volatility import *
+from xno.timeseries.technicals.htf import *
+from xno.timeseries.pattern.candles import *
+from xno.timeseries.pattern.charts import *
+from xno.timeseries.statistical import *
+from xno.timeseries.math import *
 
-from .smc import *
-from .rank import *
+from xno.timeseries.smc import *
+from xno.timeseries.rank import *
 
 import numpy as np
 

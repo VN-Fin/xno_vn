@@ -1,3 +1,3 @@
-from .fvg import FVG
-from .swings import SWING_HIGHS_LOWS
-from .bos import BOS_CHOCH
+from xno.fvg import FVG
+from xno.swings import SWING_HIGHS_LOWS
+from xno.bos import BOS_CHOCH
