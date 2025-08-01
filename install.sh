@@ -65,7 +65,7 @@ echo "[*] Installing Python requirements..."
 pip install -r requirements.txt
 
 echo "[*] Installing project in editable mode..."
-pip install -e .
+pip install .
 
 echo "[✔] Setup completed successfully."
 
